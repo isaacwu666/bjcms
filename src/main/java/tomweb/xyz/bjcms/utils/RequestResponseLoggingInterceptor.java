@@ -19,10 +19,10 @@ public class RequestResponseLoggingInterceptor implements ClientHttpRequestInter
     {
         logRequest(request, body);
         ClientHttpResponse response = execution.execute(request, body);
-        logResponse(response);
+//        logResponse(response);
 
         //Add optional additional headers
-        response.getHeaders().add("headerName", "VALUE");
+//        response.getHeaders().add("headerName", "VALUE");
 
         return response;
     }
@@ -38,6 +38,13 @@ public class RequestResponseLoggingInterceptor implements ClientHttpRequestInter
             log.debug("Request body: {}", new String(body, "UTF-8"));
             log.debug("==========================request end================================================");
         }
+        System.out.println("===========================request begin================================================");
+        System.out.println("URI         : "+request.getURI());
+        System.out.println("Method      : "+request.getMethod());
+        System.out.println("Headers     : "+request.getHeaders());
+        System.out.println("Request body: "+ new String(body, "UTF-8"));
+        System.out.println("==========================request end================================================");
+
     }
 
     private void logResponse(ClientHttpResponse response) throws IOException
@@ -50,6 +57,14 @@ public class RequestResponseLoggingInterceptor implements ClientHttpRequestInter
             log.debug("Headers      : {}", response.getHeaders());
             log.debug("Response body: {}", StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
             log.debug("=======================response end=================================================");
+        }
+        {
+            System.out.println("============================response begin==========================================");
+            System.out.println("Status code  : "+response.getStatusCode());
+            System.out.println("Status text  : "+response.getStatusText());
+            System.out.println("Headers      : "+response.getHeaders());
+            System.out.println("Response body: "+StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
+            System.out.println("=======================response end=================================================");
         }
     }
 }
