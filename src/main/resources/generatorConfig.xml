@@ -1,53 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration
-        PUBLIC " -//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
-<generatorConfiguration>
-    <classPathEntry
-            location="/Users/yehaixiao/Maven/mysql/mysql-connector-java/5.1.30/mysql-connector-java.jar"/>
-    <context id="my" targetRuntime="MyBatis3">
 
-        <!-- 生成的Java文件的编码 -->
+<generatorConfiguration>
+    <!--mysql 连接数据库jar 这里选择自己本地位置-->
+    <classPathEntry location="/Users/OSX/Project/bjcms/mysql-connector-java-5.1.41.jar"/>
+
+
+    <context id="testTables" targetRuntime="MyBatis3">
         <property name="javaFileEncoding" value="UTF-8"/>
-        <!-- 格式化java代码 -->
-        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
-        <!-- 格式化XML代码 -->
-        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+
+        <!-- 自动为entity生成swagger2文档-->
+<!--        <plugin type="com.GeneratorSwagger2Doc">-->
+<!--            <property name="apiModelAnnotationPackage" value="io.swagger.annotations.ApiModel" />-->
+<!--            <property name="apiModelPropertyAnnotationPackage" value="io.swagger.annotations.ApiModelProperty" />-->
+<!--        </plugin>-->
+
+<!--        <plugin type="cc.bandaotixi.plugins.BatchInsertPlugin"></plugin>-->
+<!--        <plugin type="cc.bandaotixi.plugins.BatchUpdatePlugin"></plugin>-->
+
+<!--        <plugin type="com.LombokPlugin">-->
+<!--            <property name="hasLombok" value="true"/>-->
+<!--        </plugin>-->
+<!--        <plugin type="com.AddHibernateValidator">-->
+<!--            <property name="addHibernateValidator" value="true"/>-->
+<!--        </plugin>-->
+
+
 
         <commentGenerator>
-            <property name="suppressDate" value="false"/>
-            <property name="suppressAllComments" value="true"/>
+            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
+            <property name="suppressAllComments" value="false"/>
         </commentGenerator>
+        <!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
+<!--        spring.datasource.url=jdbc:mysql://www.tomweb.xyz:3306/bjcms-->
+<!--        spring.datasource.username=bj_cms-->
+<!--        spring.datasource.password=Bj_cms.123-->
 
-        　　　　 <!-- mysql数据库连接 -->
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/test" userId="root"
-                        password="******"/>
+        connectionURL="jdbc:mysql://www.tomweb.xyz:3306/bjcms?characterEncoding=utf-8"
+         userId="bj_cms"
+         password="Bj_cms.123">
+            <property name="useInformationSchema" value="true" />
+        </jdbcConnection>
 
-        　　　　 <!-- 生成model实体类文件位置 -->
-        <javaModelGenerator targetPackage="com.ssmgen.demo.model"
-                            targetProject="/Users/yehaixiao/asiainfo/ssm-demo/src/main/java">
-            <property name="enableSubPackages" value="true"/>
+        <!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL 和
+           NUMERIC 类型解析为java.math.BigDecimal -->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="true"/>
+        </javaTypeResolver>
+
+        
+        <!-- targetProject:生成PO类的位置 -->
+        <javaModelGenerator targetPackage="tomweb.xyz.bjcms.pojo"
+                            targetProject="src/main/java">
+            <!-- enableSubPackages:是否让schema作为包的后缀 -->
+            <property name="enableSubPackages" value="false"/>
+            <!-- 从数据库返回的值被清理前后的空格 -->
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
-
-        　　　　<!-- 生成mapper.xml配置文件位置 -->
-        <sqlMapGenerator targetPackage="com.ssmgen.demo.mapper"
-                         targetProject="/Users/yehaixiao/asiainfo/ssm-demo/src/main/java">
-            <property name="enableSubPackages" value="true"/>
+        <!-- targetProject:mapper映射文件生成的位置
+           如果maven工程只是单独的一个工程，targetProject="src/main/java"
+           若果maven工程是分模块的工程，targetProject="所属模块的名称"，例如：
+           targetProject="ecps-manager-mapper"，下同-->
+        <!--<sqlMapGenerator targetPackage="mybatis"-->
+        <!--targetProject="src/main/resources">-->
+        <!-- enableSubPackages:是否让schema作为包的后缀 -->
+        <sqlMapGenerator
+                targetPackage="tomweb.xyz.bjcms.dao"
+                targetProject="src/main/java">
+            <property name="enableSubPackages" value="false"/>
         </sqlMapGenerator>
-
-        <!-- 生成mapper接口文件位置 -->
-        <javaClientGenerator targetPackage="com.ssmgen.demo.mapper"
-                             targetProject="/Users/yehaixiao/asiainfo/ssm-demo/src/main/java" type="XMLMAPPER">
-            <property name="enableSubPackages" value="true"/>
+        <!-- targetPackage：mapper接口生成的位置 -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="tomweb.xyz.bjcms.dao"
+                             targetProject="src/main/java">
+            <!-- enableSubPackages:是否让schema作为包的后缀 -->
+            <property name="enableSubPackages" value="false"/>
         </javaClientGenerator>
+        <!-- 指定数据库表 -->
 
-        　　　　 <!-- 需要生成的实体类对应的表名，多个实体类复制多份该配置即可 -->
-        <table tableName="TEST1" domainObjectName="Test"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false">
+<!--        <table schema="cater-shop" tableName="t_user_info" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_goods_type" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_goods_goodstype_real" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_goods_info" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--&lt;!&ndash;            is_delete&ndash;&gt;-->
+<!--            <columnOverride column="is_delete" javaType="Boolean"/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_sku" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--&lt;!&ndash;            auto_recover_stock&ndash;&gt;-->
+<!--            <columnOverride column="auto_recover_stock" javaType="Boolean"/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_shop_info" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--            <columnOverride column="delete_state" javaType="Boolean"/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_wechat_app" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_file_info" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+
+        <table tableName="bj_article" >
+            <columnOverride column="is_delete" javaType="Boolean"/>
         </table>
+        <table tableName="carticle_over_photo" >
+            <columnOverride column="is_delete" javaType="Boolean"/>
+        </table>
+        <table tableName="admin_info" >
+            <columnOverride column="is_delete" javaType="Boolean"/>
+        </table>
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--            <columnOverride column="is_pay" javaType="Boolean"/>-->
+<!--            <columnOverride column="is_refund" javaType="Boolean"/>-->
+<!--        </table>-->
+<!--        <table schema="cater-shop" tableName="t_order_goods_real" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--        </table>-->
+
+<!--         <table schema="cater-shop" tableName="t_cart" >-->
+<!--            <domainObjectRenamingRule searchString="^T" replaceString=""/>-->
+<!--             <columnOverride column="vilidate" javaType="Boolean"/>-->
+<!--             <columnOverride column="auto_recover_stock" javaType="Boolean"/>-->
+<!--        </table>-->
+
+
+
+
     </context>
 </generatorConfiguration>

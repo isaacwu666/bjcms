@@ -28,6 +28,9 @@ public class BjArticleService {
     @Autowired
     BaiJiaHaoUtils baiJiaHaoUtils;
 
+    public BjArticleMapper getBjArticleMapper() {
+        return bjArticleMapper;
+    }
 
     public void syncBjArticle() throws Exception {
         BjAccount bjAccount = getAccount();
@@ -36,7 +39,9 @@ public class BjArticleService {
         try {
             for (int page = 1; page * size <= total; page++) {
                 ArticleList articleList = baiJiaHaoUtils.getArticleList(bjAccount, page, size);
-                total = articleList.getData().getPage().getItems_count();
+                if (articleList.getData().getPage().isHas_next()){
+                    total=total+size;
+                }
                 Map<String, AritcleItem> items = articleList.getData().getItems();
                 for (String s : items.keySet()) {
                     AritcleItem aritcleItem=items.get(s);
@@ -110,6 +115,7 @@ public class BjArticleService {
         bjAccount.setServerEncodingAESKey("ZRpWPRmLImsqNIGtu62Kemmgv48GzS8h9ICK1PSsWRq");
         return bjAccount;
     }
+
 
 
 }

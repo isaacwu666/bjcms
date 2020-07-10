@@ -1,17 +1,22 @@
 package tomweb.xyz.bjcms.controller;
 
+import com.github.pagehelper.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import tomweb.xyz.bjcms.dto.BaseQuery;
 import tomweb.xyz.bjcms.pojo.BjAccount;
+import tomweb.xyz.bjcms.pojo.BjArticle;
+import tomweb.xyz.bjcms.pojo.BjArticleExample;
 import tomweb.xyz.bjcms.service.BjArticleService;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
+import tomweb.xyz.bjcms.vo.BjArticleListVo;
 
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class IndexAerticleController {
@@ -26,8 +31,25 @@ public class IndexAerticleController {
      * @return
      */
     @RequestMapping("/")
-    public ModelAndView index() {
-        return new ModelAndView("index");
+    public ModelAndView index(BaseQuery baseQuery) {
+        Page page = baseQuery.startPage();
+        BjArticleExample bjArticleExample = new BjArticleExample();
+        bjArticleExample.createCriteria().andStatusEqualTo("publish").andIsDeleteEqualTo(false)
+        ;
+        bjArticleExample.setOrderByClause("updated_at desc");
+        List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
+        List<BjArticleListVo> bjArticleVos=new ArrayList<>();
+        for (BjArticle bjArticle : bjArticles) {
+            if (bjArticle.getUpdatedAt()==null){
+                continue;
+            }
+            bjArticleVos.add(new BjArticleListVo(bjArticle));
+        }
+
+        ModelAndView modelAndView = new ModelAndView("index");
+
+        modelAndView.addObject("bjArticles",bjArticleVos);
+        return modelAndView;
     }
 
     /**
@@ -36,8 +58,8 @@ public class IndexAerticleController {
      * @return
      */
     @RequestMapping("/index.html")
-    public ModelAndView index2() {
-        return new ModelAndView("index");
+    public ModelAndView index2(BaseQuery baseQuery) {
+        return index(baseQuery);
     }
 
     @GetMapping("/syncBj")
@@ -50,8 +72,8 @@ public class IndexAerticleController {
         bjAccount.setServerToken("sciacEBTfgvKpKGsbd2GcZIRnBjHgPPu");
         bjAccount.setServerEncodingAESKey("ZRpWPRmLImsqNIGtu62Kemmgv48GzS8h9ICK1PSsWRq");
         try {
-              bjArticleService.syncBjArticle();
-              return "success";
+            bjArticleService.syncBjArticle();
+            return "success";
         } catch (Exception e) {
             e.printStackTrace();
             return "error";
