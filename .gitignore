@@ -30,3 +30,4 @@ build/
 ### VS Code ###
 .vscode/
 /admin/node_modules/
+/src/main/resources/static/admin/
