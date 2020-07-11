@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tomweb.xyz.bjcms.dto.admin.LoginDto;
 import tomweb.xyz.bjcms.pojo.AdminInfo;
@@ -14,7 +15,7 @@ import tomweb.xyz.bjcms.utils.JwtUtils;
 import tomweb.xyz.bjcms.vo.BaseVo;
 
 import java.io.UnsupportedEncodingException;
-
+//@RequestMapping("admin")
 @RestController
 public class AdminInfoApi extends BaseApi {
 

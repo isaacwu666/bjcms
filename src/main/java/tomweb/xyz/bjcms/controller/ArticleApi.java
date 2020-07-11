@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
+//@RequestMapping("admin")
 @Api
 @RestController
 public class ArticleApi extends BaseApi {
