@@ -1042,6 +1042,136 @@ public class BjArticleExample {
             addCriterion("is_delete not between", value1, value2, "isDelete");
             return (Criteria) this;
         }
+
+        public Criteria andAbstractTxtIsNull() {
+            addCriterion("abstract_txt is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtIsNotNull() {
+            addCriterion("abstract_txt is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtEqualTo(String value) {
+            addCriterion("abstract_txt =", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtNotEqualTo(String value) {
+            addCriterion("abstract_txt <>", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtGreaterThan(String value) {
+            addCriterion("abstract_txt >", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtGreaterThanOrEqualTo(String value) {
+            addCriterion("abstract_txt >=", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtLessThan(String value) {
+            addCriterion("abstract_txt <", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtLessThanOrEqualTo(String value) {
+            addCriterion("abstract_txt <=", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtLike(String value) {
+            addCriterion("abstract_txt like", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtNotLike(String value) {
+            addCriterion("abstract_txt not like", value, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtIn(List<String> values) {
+            addCriterion("abstract_txt in", values, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtNotIn(List<String> values) {
+            addCriterion("abstract_txt not in", values, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtBetween(String value1, String value2) {
+            addCriterion("abstract_txt between", value1, value2, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAbstractTxtNotBetween(String value1, String value2) {
+            addCriterion("abstract_txt not between", value1, value2, "abstractTxt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusIsNull() {
+            addCriterion("public_status is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusIsNotNull() {
+            addCriterion("public_status is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusEqualTo(Integer value) {
+            addCriterion("public_status =", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusNotEqualTo(Integer value) {
+            addCriterion("public_status <>", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusGreaterThan(Integer value) {
+            addCriterion("public_status >", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusGreaterThanOrEqualTo(Integer value) {
+            addCriterion("public_status >=", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusLessThan(Integer value) {
+            addCriterion("public_status <", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusLessThanOrEqualTo(Integer value) {
+            addCriterion("public_status <=", value, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusIn(List<Integer> values) {
+            addCriterion("public_status in", values, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusNotIn(List<Integer> values) {
+            addCriterion("public_status not in", values, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusBetween(Integer value1, Integer value2) {
+            addCriterion("public_status between", value1, value2, "publicStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPublicStatusNotBetween(Integer value1, Integer value2) {
+            addCriterion("public_status not between", value1, value2, "publicStatus");
+            return (Criteria) this;
+        }
     }
 
     /**

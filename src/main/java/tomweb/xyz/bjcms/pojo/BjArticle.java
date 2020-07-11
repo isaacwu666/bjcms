@@ -111,6 +111,18 @@ public class BjArticle {
     private Boolean isDelete;
 
     /**
+     * 
+     */
+    @ApiModelProperty(value="文章摘要",required = false)
+    private String abstractTxt;
+
+    /**
+     * 在主页的发布状态，0未发布，1发布
+     */
+    @ApiModelProperty(value="在主页的发布状态，0未发布，1发布",required = false)
+    private Integer publicStatus;
+
+    /**
      * 文章内容
      */
     @ApiModelProperty(value="文章内容",required = false)

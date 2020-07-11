@@ -20,6 +20,8 @@
     <result column="created_on" jdbcType="TIMESTAMP" property="createdOn" />
     <result column="update_on" jdbcType="TIMESTAMP" property="updateOn" />
     <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="abstract_txt" jdbcType="VARCHAR" property="abstractTxt" />
+    <result column="public_status" jdbcType="INTEGER" property="publicStatus" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="tomweb.xyz.bjcms.pojo.BjArticle">
     <!--
@@ -104,7 +106,7 @@
       This element was generated on 2020-07-10.
     -->
     id, article_id, app_id, nid, updated_at, type, status, collection, title, article_url, 
-    created_on, update_on, is_delete
+    created_on, update_on, is_delete, abstract_txt, public_status
   </sql>
   <sql id="Blob_Column_List">
     <!--
@@ -197,12 +199,14 @@
       nid, updated_at, type, 
       status, collection, title, 
       article_url, created_on, update_on, 
-      is_delete, article_body)
+      is_delete, abstract_txt, public_status, 
+      article_body)
     values (#{id,jdbcType=INTEGER}, #{articleId,jdbcType=VARCHAR}, #{appId,jdbcType=VARCHAR}, 
       #{nid,jdbcType=VARCHAR}, #{updatedAt,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, 
       #{status,jdbcType=VARCHAR}, #{collection,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
       #{articleUrl,jdbcType=VARCHAR}, #{createdOn,jdbcType=TIMESTAMP}, #{updateOn,jdbcType=TIMESTAMP}, 
-      #{isDelete,jdbcType=TINYINT}, #{articleBody,jdbcType=LONGVARCHAR})
+      #{isDelete,jdbcType=TINYINT}, #{abstractTxt,jdbcType=VARCHAR}, #{publicStatus,jdbcType=INTEGER}, 
+      #{articleBody,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="tomweb.xyz.bjcms.pojo.BjArticle">
     <!--
@@ -251,6 +255,12 @@
       <if test="isDelete != null">
         is_delete,
       </if>
+      <if test="abstractTxt != null">
+        abstract_txt,
+      </if>
+      <if test="publicStatus != null">
+        public_status,
+      </if>
       <if test="articleBody != null">
         article_body,
       </if>
@@ -294,6 +304,12 @@
       </if>
       <if test="isDelete != null">
         #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="abstractTxt != null">
+        #{abstractTxt,jdbcType=VARCHAR},
+      </if>
+      <if test="publicStatus != null">
+        #{publicStatus,jdbcType=INTEGER},
       </if>
       <if test="articleBody != null">
         #{articleBody,jdbcType=LONGVARCHAR},
@@ -358,6 +374,12 @@
       <if test="record.isDelete != null">
         is_delete = #{record.isDelete,jdbcType=TINYINT},
       </if>
+      <if test="record.abstractTxt != null">
+        abstract_txt = #{record.abstractTxt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.publicStatus != null">
+        public_status = #{record.publicStatus,jdbcType=INTEGER},
+      </if>
       <if test="record.articleBody != null">
         article_body = #{record.articleBody,jdbcType=LONGVARCHAR},
       </if>
@@ -386,6 +408,8 @@
       created_on = #{record.createdOn,jdbcType=TIMESTAMP},
       update_on = #{record.updateOn,jdbcType=TIMESTAMP},
       is_delete = #{record.isDelete,jdbcType=TINYINT},
+      abstract_txt = #{record.abstractTxt,jdbcType=VARCHAR},
+      public_status = #{record.publicStatus,jdbcType=INTEGER},
       article_body = #{record.articleBody,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -410,7 +434,9 @@
       article_url = #{record.articleUrl,jdbcType=VARCHAR},
       created_on = #{record.createdOn,jdbcType=TIMESTAMP},
       update_on = #{record.updateOn,jdbcType=TIMESTAMP},
-      is_delete = #{record.isDelete,jdbcType=TINYINT}
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      abstract_txt = #{record.abstractTxt,jdbcType=VARCHAR},
+      public_status = #{record.publicStatus,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -459,6 +485,12 @@
       <if test="isDelete != null">
         is_delete = #{isDelete,jdbcType=TINYINT},
       </if>
+      <if test="abstractTxt != null">
+        abstract_txt = #{abstractTxt,jdbcType=VARCHAR},
+      </if>
+      <if test="publicStatus != null">
+        public_status = #{publicStatus,jdbcType=INTEGER},
+      </if>
       <if test="articleBody != null">
         article_body = #{articleBody,jdbcType=LONGVARCHAR},
       </if>
@@ -484,6 +516,8 @@
       created_on = #{createdOn,jdbcType=TIMESTAMP},
       update_on = #{updateOn,jdbcType=TIMESTAMP},
       is_delete = #{isDelete,jdbcType=TINYINT},
+      abstract_txt = #{abstractTxt,jdbcType=VARCHAR},
+      public_status = #{publicStatus,jdbcType=INTEGER},
       article_body = #{articleBody,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -505,7 +539,9 @@
       article_url = #{articleUrl,jdbcType=VARCHAR},
       created_on = #{createdOn,jdbcType=TIMESTAMP},
       update_on = #{updateOn,jdbcType=TIMESTAMP},
-      is_delete = #{isDelete,jdbcType=TINYINT}
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      abstract_txt = #{abstractTxt,jdbcType=VARCHAR},
+      public_status = #{publicStatus,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

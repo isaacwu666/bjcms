@@ -8,6 +8,9 @@ import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import tomweb.xyz.bjcms.utils.RequestResponseLoggingInterceptor;
 
 import java.nio.charset.Charset;
@@ -34,4 +37,28 @@ public class BjcmsApplication {
 
         return restTemplate;
     }
+
+    private CorsConfiguration buildConfig() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowCredentials(true);//这两句不加不能跨域上传文件，
+        corsConfiguration.setMaxAge(3600l);//加上去就可以了
+        return corsConfiguration;
+    }
+
+    /**
+     * 跨域过滤器
+     * @return
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", buildConfig()); // 4
+        return new CorsFilter(source);
+    }
+
+
+
 }
