@@ -64,12 +64,10 @@
 
         <article class="excerpt excerpt-1">
           <a class="focus" href="" title="">
-        <th th:if="${article.coverPhotos eq null }" >
-          <img class="thumb" data-original="images/excerpt.jpg" src="images/logo.jpeg" alt=""></a>
-        </th>
       <th th:if="${article.coverPhotos ne null }" >
             <img  class="thumb" th:data-original="${article.coverPhotos[0].photoUrl}" th:src="${article.coverPhotos[0].photoUrl}" th:alt="${article.title}"></a>
       </th>
+
 
 
           <header><span class="cat" >图文<i></i></span>

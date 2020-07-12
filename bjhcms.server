@@ -1,0 +1,13 @@
+[Unit]
+Description=bjhcms.server
+
+
+[Service]
+Type=forking
+ExecStart=/usr/local/app/bjcms-start-stop.sh start
+ExecStop=/usr/local/app/bjcms-start-stop.sh stop
+User=www
+Group=www
+
+[Install]
+WantedBy=multi-user.target
