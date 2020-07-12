@@ -351,14 +351,14 @@
 
                 }
 
-                this.$axios.put('adminApi/aritcle', this.article).then(res => {
+                this.$axios.put('adminApi/aritcle', this.article).then((res) => {
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
                         this.$router.push("/articleList");
                         return;
                     }
-                }).catch(res => {
+                }).catch((res) => {
                     this.save = false;
                 })
             },

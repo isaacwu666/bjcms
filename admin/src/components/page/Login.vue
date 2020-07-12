@@ -55,7 +55,7 @@
                             accountSecret:this.param.username,
                             passwordSecret:this.param.password
                         }
-                        this.$axios.post("/adminApi/login",logDto).then(res=>{
+                        this.$axios.post("/adminApi/login",logDto).then((res)=>{
                             console.log(res);
                            if (res.data.code=="SUCCESS"){
                                this.$message.success("登陆成功")
