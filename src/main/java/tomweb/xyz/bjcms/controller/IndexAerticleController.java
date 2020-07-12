@@ -97,7 +97,7 @@ public class IndexAerticleController {
         }
         BjArticleDetail bjArticleDetail = new BjArticleDetail();
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
-        model.addAttribute(bjArticle);
+        model.addAttribute("bjArticleDetail",bjArticleDetail);
         return "article";
     }
 
