@@ -107,7 +107,7 @@ public class IndexAerticleController {
 
         BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
         if (bjArticle == null||bjArticle.getPublicStatus()!=1) {
-            return "404";
+            return "/error/404";
         }
         BjArticleDetail bjArticleDetail = new BjArticleDetail();
         bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));

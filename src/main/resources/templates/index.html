@@ -63,7 +63,7 @@
       <tr  th:each="article,articleStart : ${bjArticles}">
 
         <article class="excerpt excerpt-1">
-          <a class="focus" href="" title="">
+          <a class="focus" th:href="@{'/a/'+${article.id}}" title="">
       <th th:if="${article.coverPhotos ne null }" >
             <img  class="thumb" th:data-original="${article.coverPhotos[0].photoUrl}" th:src="${article.coverPhotos[0].photoUrl}" th:alt="${article.title}"></a>
       </th>
@@ -77,7 +77,7 @@
             <time class="time" >
               <i class="glyphicon glyphicon-time"></i><span th:text="${article.getBjUpdateAtStr()}"></span>
             </time>
-            <a class="comment" th:href="@{${article.getArticleUrl()}}"  ><i class="glyphicon glyphicon-comment"></i> 百家号文章</a></p>
+            <a th:if=" ${article.getArticleUrl()} ne null" class="comment" th:href="@{${article.getArticleUrl()}}"  ><i class="glyphicon glyphicon-comment"></i> 百家号文章</a></p>
           <p class="note" style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp:4;" th:text="${article.getArticleBody()}"></p>
         </article>
 
