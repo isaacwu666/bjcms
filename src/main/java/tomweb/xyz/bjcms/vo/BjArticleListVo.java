@@ -13,6 +13,7 @@ import java.util.Date;
 @Data
 public class BjArticleListVo {
 
+    private Integer id;
 
     @ApiModelProperty(value = "百度平台更新于", required = true)
     private Date bjUpdateAt;

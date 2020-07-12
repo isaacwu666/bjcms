@@ -1,9 +1,12 @@
 package tomweb.xyz.bjcms.controller;
 
 import com.github.pagehelper.Page;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -13,8 +16,12 @@ import tomweb.xyz.bjcms.pojo.BjArticle;
 import tomweb.xyz.bjcms.pojo.BjArticleExample;
 import tomweb.xyz.bjcms.service.BjArticleService;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
+import tomweb.xyz.bjcms.vo.BjArticleDetail;
 import tomweb.xyz.bjcms.vo.BjArticleListVo;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +45,9 @@ public class IndexAerticleController {
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
-        List<BjArticleListVo> bjArticleVos=new ArrayList<>();
+        List<BjArticleListVo> bjArticleVos = new ArrayList<>();
         for (BjArticle bjArticle : bjArticles) {
-            if (bjArticle.getUpdatedAt()==null){
+            if (bjArticle.getUpdatedAt() == null) {
                 continue;
             }
             bjArticleVos.add(new BjArticleListVo(bjArticle));
@@ -48,7 +55,7 @@ public class IndexAerticleController {
 
         ModelAndView modelAndView = new ModelAndView("index");
 
-        modelAndView.addObject("bjArticles",bjArticleVos);
+        modelAndView.addObject("bjArticles", bjArticleVos);
         return modelAndView;
     }
 
@@ -62,7 +69,7 @@ public class IndexAerticleController {
         return index(baseQuery);
     }
 
-    @GetMapping("/syncBj")
+    //    @GetMapping("/syncBj")
     @ResponseBody
     public Object syncBj() {
         BjAccount bjAccount = new BjAccount();
@@ -79,6 +86,43 @@ public class IndexAerticleController {
             return "error";
         }
 
+    }
+
+    @RequestMapping("/a/{id}")
+    public String detail(@PathVariable("id") Integer id, Model model) {
+
+        BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
+        if (bjArticle == null) {
+            return "404";
+        }
+        BjArticleDetail bjArticleDetail = new BjArticleDetail();
+        BeanUtils.copyProperties(bjArticle, bjArticleDetail);
+        model.addAttribute(bjArticle);
+        return "article";
+    }
+
+    /**
+     * 网站robots.txt
+     *
+     * @param response
+     */
+    @RequestMapping("/robots.txt")
+    public void robots(HttpServletResponse response) {
+        //text/plain; charset=UTF-8
+        response.setContentType("text/plain; charset=UTF-8");
+        String txt = "User-agent: *\n" +
+                "Disallow: \n" +
+                "Disallow: /admin/\n" +
+                "Disallow: /adminApi/";
+
+        try {
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(txt.getBytes("UTF-8"));
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
     }
 }
 

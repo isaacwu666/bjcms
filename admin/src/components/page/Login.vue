@@ -49,7 +49,8 @@
                 }else {
                     this.submit=true;
                 }
-                this.$refs.login.validate(valid => {
+                var that=this;
+                this.$refs.login.validate((valid) => {
                     if (valid) {
                         var logDto={
                             accountSecret:this.param.username,
@@ -58,26 +59,26 @@
                         this.$axios.post("/adminApi/login",logDto).then((res)=>{
                             console.log(res);
                            if (res.data.code=="SUCCESS"){
-                               this.$message.success("登陆成功")
+                               that.$message.success("登陆成功")
                                sessionStorage.setItem("token", res.data.data)
-                               this.$router.push('/articleList')
+                               that.$router.push('/articleList')
                                return
                            }else {
-                               this.$message.error(res.data.msg)
-                               this.submit=false
+                               that.$message.error(res.data.msg)
+                               that.submit=false
                            }
 
                         }).catch((res)=>{
                             console.log(res)
-                            this.$message.error('网络异常')
-                            this.submit=false
+                            that.$message.error('网络异常')
+                            that.submit=false
                         })
 
 
                     } else {
-                        this.$message.error('请输入账号和密码')
+                        that.$message.error('请输入账号和密码')
                         console.log('error submit!! 百家号@爱旅游爱工作')
-                        this.submit=false
+                        that.submit=false
                         return false;
                     }
                 });
