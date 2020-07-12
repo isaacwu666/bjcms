@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
 import tomweb.xyz.bjcms.pojo.ArticleCoverPhotoExample;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -69,4 +70,6 @@ public interface ArticleCoverPhotoMapper {
      * @mbg.generated 2020-07-10
      */
     int updateByExample(@Param("record") ArticleCoverPhoto record, @Param("example") ArticleCoverPhotoExample example);
+
+    List<ArticleCoverPhoto> selectByAricleIds(@Param("ids") List ids);
 }

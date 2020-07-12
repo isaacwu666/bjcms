@@ -4,11 +4,13 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.BeanUtils;
+import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
 import tomweb.xyz.bjcms.pojo.BjArticle;
 
 import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class BjArticleListVo {
@@ -66,6 +68,7 @@ public class BjArticleListVo {
         if (bjArticle == null) {
             return;
         }
+
         BeanUtils.copyProperties(bjArticle, this);
         if (getArticleBody()!=null){
             if (getArticleBody().length()>200){
@@ -76,5 +79,7 @@ public class BjArticleListVo {
             bjUpdateAt = new Date(bjArticle.getUpdatedAt() * 1000);
         }
     }
+
+    List<ArticleCoverPhoto> coverPhotos;
 
 }

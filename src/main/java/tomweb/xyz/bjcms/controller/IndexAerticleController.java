@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dto.BaseQuery;
+import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
 import tomweb.xyz.bjcms.pojo.BjAccount;
 import tomweb.xyz.bjcms.pojo.BjArticle;
 import tomweb.xyz.bjcms.pojo.BjArticleExample;
+import tomweb.xyz.bjcms.service.ArticleCoverPhotoService;
 import tomweb.xyz.bjcms.service.BjArticleService;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
@@ -22,8 +25,7 @@ import tomweb.xyz.bjcms.vo.BjArticleListVo;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class IndexAerticleController {
@@ -31,6 +33,8 @@ public class IndexAerticleController {
     BaiJiaHaoUtils baiJiaHaoUtils;
     @Autowired
     BjArticleService bjArticleService;
+    @Autowired
+    ArticleCoverPhotoService articleCoverPhotoService;
 
     /**
      * 主页
@@ -42,15 +46,25 @@ public class IndexAerticleController {
         Page page = baseQuery.startPage();
         BjArticleExample bjArticleExample = new BjArticleExample();
         bjArticleExample.createCriteria().andStatusEqualTo("publish").andIsDeleteEqualTo(false)
+        .andPublicStatusEqualTo(1);
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
+        Set<Integer> articleIs = new HashSet<>();
         List<BjArticleListVo> bjArticleVos = new ArrayList<>();
         for (BjArticle bjArticle : bjArticles) {
             if (bjArticle.getUpdatedAt() == null) {
                 continue;
             }
+            articleIs.add(bjArticle.getId());
+           if ( bjArticle.getArticleBody()!=null){
+               bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString( bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
+           }
             bjArticleVos.add(new BjArticleListVo(bjArticle));
+        }
+        Map<Integer, List<ArticleCoverPhoto>> coverMap = articleCoverPhotoService.queryArticleCoverPhotoMap(articleIs);
+        for (BjArticleListVo bjArticleVo : bjArticleVos) {
+            bjArticleVo.setCoverPhotos(coverMap.get(bjArticleVo.getId()));
         }
 
         ModelAndView modelAndView = new ModelAndView("index");
@@ -92,12 +106,13 @@ public class IndexAerticleController {
     public String detail(@PathVariable("id") Integer id, Model model) {
 
         BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
-        if (bjArticle == null) {
+        if (bjArticle == null||bjArticle.getPublicStatus()!=1) {
             return "404";
         }
         BjArticleDetail bjArticleDetail = new BjArticleDetail();
+        bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
-        model.addAttribute("bjArticleDetail",bjArticleDetail);
+        model.addAttribute("bjArticleDetail", bjArticleDetail);
         return "article";
     }
 

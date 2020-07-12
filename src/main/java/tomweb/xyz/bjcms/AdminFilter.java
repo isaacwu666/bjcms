@@ -10,6 +10,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.LogRecord;
 
 @WebFilter(filterName = "AdminFilter", urlPatterns = "/adminApi/*")
@@ -29,6 +30,7 @@ public class AdminFilter implements Filter {
         String url = req.getRequestURI();
         if (!url.startsWith("/adminApi")) {
             filterChain.doFilter(req, servletResponse);
+            return;
         }
         if (url.contains("/adminApi/login")){
             filterChain.doFilter(req, servletResponse);
@@ -45,8 +47,10 @@ public class AdminFilter implements Filter {
                 baseVo.setMsg("登陆失效，重新登陆");
                 //Content-Type: application/json
                 servletResponse.setContentType("application/json;charset=UTF-8");
-                servletResponse.getOutputStream().write(JSONObject.toJSONString(baseVo).getBytes("utf-8"));
-                servletResponse.getOutputStream().close();
+                servletResponse.setContentType("application/json;charset=UTF-8");
+                OutputStream outputStream= servletResponse.getOutputStream();
+                outputStream.write(JSONObject.toJSONString(baseVo).getBytes("utf-8"));
+                outputStream.close();
                 return;
             }
             filterChain.doFilter(servletRequest, servletResponse);
@@ -56,8 +60,9 @@ public class AdminFilter implements Filter {
             baseVo.setCode("LOGIN_ERROR");
             baseVo.setMsg("登陆失效，重新登陆");
             servletResponse.setContentType("application/json;charset=UTF-8");
-            servletResponse.getOutputStream().write(JSONObject.toJSONString(baseVo).getBytes("utf-8"));
-            servletResponse.getOutputStream().close();
+            OutputStream outputStream= servletResponse.getOutputStream();
+            outputStream.write(JSONObject.toJSONString(baseVo).getBytes("utf-8"));
+            outputStream.close();
             return;
         }
 
