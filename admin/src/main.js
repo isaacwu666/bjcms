@@ -53,6 +53,19 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+axios.interceptors.response.use(function (response) {
+  if (response.data.code=="LOGIN_ERROR") {
+    // console.log("")
+    router.push("/login");
+    return response;
+  }
+
+  return response
+}), function (error) {
+  // 捕获异常状态码
+  return new Promise(function () { })
+}
+
 new Vue({
   router,
   i18n,

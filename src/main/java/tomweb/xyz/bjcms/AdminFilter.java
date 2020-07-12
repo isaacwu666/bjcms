@@ -36,8 +36,6 @@ public class AdminFilter implements Filter {
         }
         String token = req.getHeader("token");
         if (token != null) {
-            //    :TODO check token
-
             Integer userId = jwtUtils.getUserIdByToken(token);
             if (userId==null){
 
@@ -51,7 +49,7 @@ public class AdminFilter implements Filter {
                 servletResponse.getOutputStream().close();
                 return;
             }
-            filterChain.doFilter(req, servletResponse);
+            filterChain.doFilter(servletRequest, servletResponse);
         } else {
             BaseVo baseVo =new BaseVo();
             baseVo.setData(null);

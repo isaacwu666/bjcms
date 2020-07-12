@@ -81,21 +81,26 @@ public class ArticleApi extends BaseApi {
         }
         Integer id = bjArticle.getId();
         List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
-        if (!CollectionUtils.isEmpty(coverPhotos)) {
-            ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
-            example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
-            articleCoverPhotoMapper.deleteByExample(example);
 
-            for (ArticleCoverPhoto coverPhoto : coverPhotos) {
-                if (coverPhoto==null){
-                    continue;
+        if (!CollectionUtils.isEmpty(coverPhotos)) {
+            if (  coverPhotos.get(0)!=null){
+
+                ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
+                example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
+                articleCoverPhotoMapper.deleteByExample(example);
+
+                for (ArticleCoverPhoto coverPhoto : coverPhotos) {
+                    if (coverPhoto==null){
+                        continue;
+                    }
+                    coverPhoto.setArticleId(id);
+                    if (coverPhoto.getPhotoUrl()==null){
+                        continue;
+                    }
+                    articleCoverPhotoMapper.insert(coverPhoto);
                 }
-                coverPhoto.setArticleId(id);
-                if (coverPhoto.getPhotoUrl()==null){
-                    continue;
-                }
-                articleCoverPhotoMapper.insert(coverPhoto);
             }
+
         }
 
         bjArticleService.getBjArticleMapper().updateByPrimaryKeyWithBLOBs(bjArticle);

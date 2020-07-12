@@ -341,8 +341,11 @@
                 this.save = true;
                 if (this.coverCount == 1) {
                     var covers = [];
-                    covers[0]=this.article.covers[0]
-                    this.article.covers = covers;
+                    if (this.article.covers[0]){
+                        covers[0]=this.article.covers[0]
+                        this.article.covers = covers;
+                    }
+
                 }else {
                     if (this.article.covers.length<this.coverCount){
                         this.$message.error("请上传图片");

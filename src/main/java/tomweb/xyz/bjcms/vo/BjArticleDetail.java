@@ -16,4 +16,6 @@ public class BjArticleDetail extends BjArticle {
     List<ArticleCoverPhoto> covers;
 
 
+
+
 }
