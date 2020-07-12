@@ -32,6 +32,7 @@ public class AdminFilter implements Filter {
         }
         if (url.contains("/adminApi/login")){
             filterChain.doFilter(req, servletResponse);
+            return;
         }
         String token = req.getHeader("token");
         if (token != null) {

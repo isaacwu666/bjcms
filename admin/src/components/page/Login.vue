@@ -56,11 +56,12 @@
                             accountSecret:this.param.username,
                             passwordSecret:this.param.password
                         }
-                        this.$axios.post("/adminApi/login",logDto).then((res)=>{
+                        that.$axios.post("/adminApi/login",logDto).then((res)=>{
                             console.log(res);
                            if (res.data.code=="SUCCESS"){
                                that.$message.success("登陆成功")
                                sessionStorage.setItem("token", res.data.data)
+                               that.$axios.defaults.headers.common['token'] = res.data.data||null
                                that.$router.push('/articleList')
                                return
                            }else {
