@@ -83,25 +83,6 @@ public class IndexAerticleController {
         return index(baseQuery);
     }
 
-    //    @GetMapping("/syncBj")
-    @ResponseBody
-    public Object syncBj() {
-        BjAccount bjAccount = new BjAccount();
-        bjAccount.setAppId("1663934735086891");
-        bjAccount.setAppToken("30b639fc41348753f55b80a2980bb30e");
-        bjAccount.setServerUrl("https://bjh.tomweb.xyz");
-        bjAccount.setServerToken("sciacEBTfgvKpKGsbd2GcZIRnBjHgPPu");
-        bjAccount.setServerEncodingAESKey("ZRpWPRmLImsqNIGtu62Kemmgv48GzS8h9ICK1PSsWRq");
-        try {
-            bjArticleService.syncBjArticle();
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-
-    }
-
     @RequestMapping("/a/{id}")
     public String detail(@PathVariable("id") Integer id, Model model) {
 

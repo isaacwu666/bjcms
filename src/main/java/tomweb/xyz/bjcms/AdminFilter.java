@@ -54,7 +54,25 @@ public class AdminFilter implements Filter {
                 return;
             }
             filterChain.doFilter(servletRequest, servletResponse);
-        } else {
+        } else if (url.contains("/adminApi/file")){
+            token=servletRequest.getParameter("token");
+            Integer userId = jwtUtils.getUserIdByToken(token);
+            if (userId==null){
+
+                BaseVo baseVo =new BaseVo();
+                baseVo.setData(null);
+                baseVo.setCode("LOGIN_ERROR");
+                baseVo.setMsg("登陆失效，重新登陆");
+                //Content-Type: application/json
+                servletResponse.setContentType("application/json;charset=UTF-8");
+                servletResponse.setContentType("application/json;charset=UTF-8");
+                OutputStream outputStream= servletResponse.getOutputStream();
+                outputStream.write(JSONObject.toJSONString(baseVo).getBytes("utf-8"));
+                outputStream.close();
+                return;
+            }
+            filterChain.doFilter(servletRequest, servletResponse);
+        }else {
             BaseVo baseVo =new BaseVo();
             baseVo.setData(null);
             baseVo.setCode("LOGIN_ERROR");

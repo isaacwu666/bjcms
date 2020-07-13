@@ -60,7 +60,7 @@
                             console.log(res);
                            if (res.data.code=="SUCCESS"){
                                that.$message.success("登陆成功")
-                               sessionStorage.setItem("token", res.data.data)
+                               localStorage.setItem("token", res.data.data)
                                that.$axios.defaults.headers.common['token'] = res.data.data||null
                                that.$router.push('/articleList')
                                return

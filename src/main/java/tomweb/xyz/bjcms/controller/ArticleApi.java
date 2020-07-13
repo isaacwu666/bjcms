@@ -7,14 +7,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dto.BaseQuery;
-import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
-import tomweb.xyz.bjcms.pojo.ArticleCoverPhotoExample;
-import tomweb.xyz.bjcms.pojo.BjArticle;
-import tomweb.xyz.bjcms.pojo.BjArticleExample;
+import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.service.BjArticleService;
 import tomweb.xyz.bjcms.vo.BaseVo;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
@@ -24,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 //@RequestMapping("admin")
@@ -41,12 +40,31 @@ public class ArticleApi extends BaseApi {
     ArticleCoverPhotoMapper articleCoverPhotoMapper;
 
     @GetMapping("adminApi/aritcleList")
-    public BaseVo<List<BjArticleListVo>> queryList(BaseQuery baseQuery) {
+    public BaseVo<List<BjArticleListVo>> queryList(BaseQuery baseQuery,String title) {
+
         BjArticleExample example = new BjArticleExample();
-        example.createCriteria().andIsDeleteEqualTo(false);
+        BjArticleExample.Criteria criteria=  example.createCriteria().andIsDeleteEqualTo(false);
+        if (!StringUtils.isEmpty(title)){
+            criteria.andTitleLike("%"+title+"%");
+        }
+        example.setOrderByClause(" updated_at desc,created_on desc");
         Page page = baseQuery.startPage();
         bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(example);
         return success(page);
+    }
+
+
+    @GetMapping("adminApi/syncBjaritcle")
+    @ResponseBody
+    public Object syncBj() {
+        try {
+            bjArticleService.syncBjArticle();
+            return "success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
+
     }
 
 
@@ -65,6 +83,17 @@ public class ArticleApi extends BaseApi {
         List<ArticleCoverPhoto> photos = articleCoverPhotoMapper.selectByExample(example);
         bjArticleDetail.setCovers(photos);
         return success(bjArticleDetail);
+    }
+///adminApi/article
+    @DeleteMapping("adminApi/article/{id}")
+    public BaseVo<BjArticleDetail> delete(@PathVariable("id") Integer id) {
+
+        BjArticle bjArticle =new BjArticle();
+        bjArticle.setId(id);
+        bjArticle.setUpdateOn(new Date());
+        bjArticle.setIsDelete(true);
+        bjArticleService.getBjArticleMapper().updateByPrimaryKey(bjArticle);
+        return success();
     }
 
     /**
@@ -106,6 +135,48 @@ public class ArticleApi extends BaseApi {
         bjArticleService.getBjArticleMapper().updateByPrimaryKeyWithBLOBs(bjArticle);
         return success();
     }
+
+    @PostMapping("adminApi/aritcle")
+    public BaseVo<BjArticleDetail> insert(@RequestBody BjArticleDetail bjArticle) {
+
+
+        List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
+        bjArticleService.getBjArticleMapper().insertSelective(bjArticle);
+        Integer id = bjArticle.getId();
+        if (bjArticle.getId()==null){
+            return error("保存错误");
+        }
+        if (!CollectionUtils.isEmpty(coverPhotos)) {
+            if (  coverPhotos.get(0)!=null){
+                ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
+                example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
+                articleCoverPhotoMapper.deleteByExample(example);
+
+                for (ArticleCoverPhoto coverPhoto : coverPhotos) {
+                    if (coverPhoto==null){
+                        continue;
+                    }
+                    coverPhoto.setArticleId(id);
+                    if (coverPhoto.getPhotoUrl()==null){
+                        continue;
+                    }
+                    articleCoverPhotoMapper.insert(coverPhoto);
+                }
+            }
+
+        }
+
+
+        return success();
+    }
+
+    private BaseVo<BjArticleDetail> error(String msg) {
+        BaseVo baseVo=new BaseVo();
+        baseVo.setCode("ERROR");
+        baseVo.setMsg(msg);
+        return baseVo;
+    }
+
 
     @ApiOperation("上传文件")
     @PostMapping("adminApi/file")

@@ -18,9 +18,9 @@ Vue.config.productionTip = false;
 Vue.use(VueI18n);
 // axios.defaults.baseURL="http://localhost:8010";
 
-var token = sessionStorage.getItem("token")||null;
+var token = localStorage.getItem("token")||null;
 // console.error(token)
-axios.defaults.headers.common['token'] = sessionStorage.getItem("token")||null
+axios.defaults.headers.common['token'] = localStorage.getItem("token")||null
 
 Vue.prototype.$axios=axios
 // Vue.prototype.$loading=Loading
@@ -35,7 +35,7 @@ const i18n = new VueI18n({
 // //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
   document.title = `${to.meta.title} | 百家号@爱旅游爱工作`;
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token');
   if (!token && to.path !== '/login') {
     next('/login');
   } else if (to.meta.permission) {

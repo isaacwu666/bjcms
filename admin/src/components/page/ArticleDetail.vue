@@ -5,7 +5,7 @@
             <span style="line-height: 60px;margin-right: 30px;float: right"><a href="/" @click="logout()">退出</a></span>
         </div>
         <div class="container-editor" v-loading="save">
-            <div class="editor">
+            <div class="editor" v-show="!uploadCover">
                 <div ref="editor" style="text-align:left"></div>
             </div>
             <div class="cover">
@@ -29,20 +29,20 @@
                             <div class="cove-upload">
                                 <div @click="uploadArticle(0)"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img v-if="article.covers[0]" :src="article.covers[0].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[0]" :src="article.covers[0].photoUrl">
 
                                 </div>
                                 <div @click="uploadArticle(1) " v-show="coverCount>1"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img v-if="article.covers[1]" :src="article.covers[1].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[1]" :src="article.covers[1].photoUrl">
                                 </div>
                                 <div @click="uploadArticle(2)" v-show="coverCount>2"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img v-if="article.covers[2]" :src="article.covers[2].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[2]" :src="article.covers[2].photoUrl">
                                 </div>
 
                                 <el-dialog :visible.sync="dialogVisible">
-                                    <img width="100%" :src="dialogImageUrl" alt="">
+                                    <img  :src="dialogImageUrl" alt="">
                                 </el-dialog>
                             </div>
                         </el-form-item>
@@ -86,7 +86,7 @@
                         :headers="headers"
                         :on-preview="handlePictureCardPreview"
                         :on-success="fileUploadSuccess"
-                        :on-remove="handleRemove">
+                       >
                     <i class="el-icon-plus"></i>
                 </el-upload>
 
@@ -214,6 +214,7 @@
                     updateOn: null,
                     updatedAt: null,
                 },
+                add:false,
                 save: false,
                 //预览照片地址
                 dialogImageUrl: null,
@@ -226,14 +227,21 @@
         },
         created() {
             this.article.id = this.$route.query.id
-            this.headers.token = sessionStorage.getItem('token');
+            this.headers.token = localStorage.getItem('token');
             // this.loadArticleDetail(this.article.id);
         },
         mounted() {
             // this.article.id=this.$route.query.id
-
+            this.article.id = this.$route.query.id
+            this.add = this.$route.query.add||false;
+            var that= this;
             if (this.article.id) {
                 this.loadArticleDetail(this.article.id);
+            }else if (this.add){
+                for (var key in this.article){
+                    this.article[key]=null;
+                }
+                this.article.covers=[];
             }
             var editor = new E(this.$refs.editor)
             editor.customConfig.onchange = (html) => {
@@ -289,8 +297,13 @@
 
                     // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
                     console.log("res",result)
-                    var url = result.data
-                    insertImg(url)
+                    if (result.code=="SUCCESS"){
+                        var url = result.data
+                        insertImg(url)
+                    }else {
+                        that.$message.error("保存错误！");
+                    }
+
 
                     // result 必须是一个 JSON 格式字符串！！！否则报错
                 }
@@ -302,7 +315,7 @@
         },
         methods: {
             logout() {
-                sessionStorage.removeItem('token');
+                localStorage.removeItem('token');
                 this.$router.push('/');
             },
 
@@ -353,18 +366,45 @@
                     }
 
                 }
+                if (this.add){
+                    this.addToSever();
+                } else {
+                    this.updateToSever();
+                }
 
+
+            },
+            updateToSever(){
                 this.$axios.put('/adminApi/aritcle', this.article).then((res) => {
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
                         this.$router.push("/articleList");
                         return;
+                    }else {
+                        this.save = false;
+                        this.$message.error("保存错误");
                     }
                 }).catch((res) => {
                     this.save = false;
                 })
             },
+            addToSever(){
+                this.$axios.post('/adminApi/aritcle', this.article).then((res) => {
+                    this.save = false;
+                    if (res.data.code == "SUCCESS") {
+                        this.$message.success(res.data.msg);
+                        this.$router.push("/articleList");
+                        return;
+                    }else {
+                        this.save = false;
+                        this.$message.error("保存错误");
+                    }
+                }).catch((res) => {
+                    this.save = false;
+                })
+            },
+
             //文件上传成功时
             fileUploadSuccess(response, file, fileList) {
                 // debugger
@@ -373,6 +413,8 @@
                     var c = this.createCover(response.data);
                     this.article.covers = this.article.covers || [];
                     this.article.covers[this.uploadCoverItem] = c;
+                }else {
+                    this.$message.error("上传图片失败，请重新上传");
                 }
             },
             //移除文件时
@@ -380,6 +422,9 @@
                 console.log(file, fileList);
             },
             createCover(path) {
+                if (!path){
+                    this.$message.error("图片路径为空");
+                }
                 var cover = {
                     articleId: this.article.id,
                     photoUrl: path,

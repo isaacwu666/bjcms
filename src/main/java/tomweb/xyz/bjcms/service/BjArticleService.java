@@ -92,6 +92,7 @@ public class BjArticleService {
         BeanUtils.copyProperties(aritcleItem, bjArticle);
         bjArticle.setCreatedOn(new Date());
         bjArticle.setIsDelete(false);
+        bjArticle.setPublicStatus(0);
         bjArticle.setArticleBody(baiJiaHaoUtils.getArticleBody(aritcleItem.getArticleUrl()));
         System.out.println(JSONObject.toJSONString(bjArticle));
         bjArticleMapper.insertSelective(bjArticle);

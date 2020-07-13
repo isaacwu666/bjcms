@@ -18,7 +18,7 @@ public class JwtUtils {
     //私钥
     private static final String TOKEN_SECRET = "privateKey";
 
-    private static  final int expire=100;
+//    private static  final int expire=1000000000;
 
     private String secret="1fds9ds";
 
@@ -28,13 +28,13 @@ public class JwtUtils {
     public String generateToken(long userId) {
         Date nowDate = new Date();
         //过期时间
-        Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+//        Date expireDate = new Date(nowDate.getTime() + expire * 1000);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setSubject(userId+"")
                 .setIssuedAt(nowDate)
-                .setExpiration(expireDate)
+//                .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
