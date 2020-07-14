@@ -3,6 +3,7 @@ package tomweb.xyz.bjcms.controller;
 import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,12 @@ public class IndexAerticleController {
     BjArticleService bjArticleService;
     @Autowired
     ArticleCoverPhotoService articleCoverPhotoService;
+    @Value("${spring.profiles.active}")
+    String active;
+
+    private boolean isProd(){
+        return Objects.equals("prod",active);
+    }
 
     /**
      * 主页
@@ -60,6 +67,7 @@ public class IndexAerticleController {
            if ( bjArticle.getArticleBody()!=null){
                bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString( bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
            }
+
             bjArticleVos.add(new BjArticleListVo(bjArticle));
         }
         Map<Integer, List<ArticleCoverPhoto>> coverMap = articleCoverPhotoService.queryArticleCoverPhotoMap(articleIs);
@@ -68,6 +76,7 @@ public class IndexAerticleController {
         }
 
         ModelAndView modelAndView = new ModelAndView("index");
+        modelAndView.addObject("prod",isProd());
 
         modelAndView.addObject("bjArticles", bjArticleVos);
         return modelAndView;
@@ -94,6 +103,7 @@ public class IndexAerticleController {
         bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
+        model.addAttribute("prod",isProd());
         return "article";
     }
 
