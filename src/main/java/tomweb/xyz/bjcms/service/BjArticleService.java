@@ -4,16 +4,18 @@ import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.thymeleaf.util.ListUtils;
+import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dao.BjArticleMapper;
 import tomweb.xyz.bjcms.dto.QueryArticleList;
 import tomweb.xyz.bjcms.dto.bj.AritcleItem;
 import tomweb.xyz.bjcms.dto.bj.ArticleList;
-import tomweb.xyz.bjcms.pojo.BjAccount;
-import tomweb.xyz.bjcms.pojo.BjArticle;
-import tomweb.xyz.bjcms.pojo.BjArticleExample;
+import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.pojo.BjArticle;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
+import tomweb.xyz.bjcms.vo.BjArticleDetail;
 
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -39,13 +41,13 @@ public class BjArticleService {
         try {
             for (int page = 1; page * size <= total; page++) {
                 ArticleList articleList = baiJiaHaoUtils.getArticleList(bjAccount, page, size);
-                if (articleList.getData().getPage().isHas_next()){
-                    total=total+size;
+                if (articleList.getData().getPage().isHas_next()) {
+                    total = total + size;
                 }
                 Map<String, AritcleItem> items = articleList.getData().getItems();
                 for (String s : items.keySet()) {
-                    AritcleItem aritcleItem=items.get(s);
-                    if (aritcleItem.getAppId()==null){
+                    AritcleItem aritcleItem = items.get(s);
+                    if (aritcleItem.getAppId() == null) {
                         aritcleItem.setAppId(bjAccount.getAppId());
                     }
                     syncAritcleItem(aritcleItem);
@@ -53,7 +55,7 @@ public class BjArticleService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw  e;
+            throw e;
         }
     }
 
@@ -98,8 +100,8 @@ public class BjArticleService {
         bjArticleMapper.insertSelective(bjArticle);
     }
 
-    private String getAerticleBodyByUrl(String url){
-      return   baiJiaHaoUtils.getArticleBody(url);
+    private String getAerticleBodyByUrl(String url) {
+        return baiJiaHaoUtils.getArticleBody(url);
     }
 
     /**
@@ -117,6 +119,34 @@ public class BjArticleService {
         return bjAccount;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void addAricle(BjArticleDetail bjArticle) {
+        Integer id = bjArticle.getId();
+        List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
+        if (bjArticle.getId() == null) {
+            throw new RuntimeException("保存错误");
+        }
+        if (!CollectionUtils.isEmpty(coverPhotos)) {
+            if (coverPhotos.get(0) != null) {
+                ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
+                example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
+                articleCoverPhotoMapper.deleteByExample(example);
 
+                for (ArticleCoverPhoto coverPhoto : coverPhotos) {
+                    if (coverPhoto == null) {
+                        continue;
+                    }
+                    coverPhoto.setArticleId(id);
+                    if (coverPhoto.getPhotoUrl() == null) {
+                        continue;
+                    }
+                    articleCoverPhotoMapper.insert(coverPhoto);
+                }
+            }
 
+        }
+    }
+
+    @Autowired
+    ArticleCoverPhotoMapper articleCoverPhotoMapper;
 }

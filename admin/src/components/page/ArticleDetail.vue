@@ -6,7 +6,7 @@
         </div>
         <div class="container-editor" v-loading="save">
             <div class="editor" v-show="!uploadCover">
-                <div ref="editor" style="text-align:left"></div>
+                <div ref="editor" style="text-align:left;height: 100%"></div>
             </div>
             <div class="cover">
                 <div style="margin-top: 20px">
@@ -29,20 +29,23 @@
                             <div class="cove-upload">
                                 <div @click="uploadArticle(0)"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[0]" :src="article.covers[0].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[0]"
+                                         :src="article.covers[0].photoUrl">
 
                                 </div>
                                 <div @click="uploadArticle(1) " v-show="coverCount>1"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[1]" :src="article.covers[1].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[1]"
+                                         :src="article.covers[1].photoUrl">
                                 </div>
                                 <div @click="uploadArticle(2)" v-show="coverCount>2"
                                      style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[2]" :src="article.covers[2].photoUrl">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[2]"
+                                         :src="article.covers[2].photoUrl">
                                 </div>
 
                                 <el-dialog :visible.sync="dialogVisible">
-                                    <img  :src="dialogImageUrl" alt="">
+                                    <img :src="dialogImageUrl" alt="">
                                 </el-dialog>
                             </div>
                         </el-form-item>
@@ -60,6 +63,9 @@
 
             </div>
             <div class="bton">
+                <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
+                           @click="saveArticlelocal()">缓存
+                </el-button>
                 <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
                            @click="saveArticle()">保存
                 </el-button>
@@ -86,7 +92,7 @@
                         :headers="headers"
                         :on-preview="handlePictureCardPreview"
                         :on-success="fileUploadSuccess"
-                       >
+                >
                     <i class="el-icon-plus"></i>
                 </el-upload>
 
@@ -116,9 +122,9 @@
 
     .editor {
         width: 80%;
-        max-width: 700px;
-        min-width: 600px;
-        max-height: 700px;
+        max-width: 1000px;
+        min-width: 800px;
+        height: 800px;
         overflow-y: scroll;
         margin: 0 auto;
         box-shadow: 1px 1px 1px 1px #cbcbcb, -1px 1px 1px 1px rgba(255, 255, 255, 0.5);
@@ -143,6 +149,9 @@
         /*height: 1000px;*/
         margin: 20px auto;
         box-shadow: 1px 1px 1px 1px #cbcbcb, -1px 1px 1px 1px rgba(255, 255, 255, 0.5)
+    }
+    .w-e-text-container{
+        height: 600px !important;/*!important是重点，因为原div是行内样式设置的高度300px*/
     }
 
     .cove-upload {
@@ -170,19 +179,17 @@
 
 </style>
 <script>
-    import { Loading } from 'element-ui';
+    import {Loading} from 'element-ui';
     import E from 'wangeditor'
 
     import {ImageDrop} from 'quill-image-drop-module';
 
     // Quill.register('modules/imageDrop', ImageDrop);
     export default {
-        components: {
-
-        },
+        components: {},
         data() {
             return {
-                editor:null,
+                editor: null,
 
                 coverCount: 1,
                 uploadCover: false,
@@ -214,7 +221,7 @@
                     updateOn: null,
                     updatedAt: null,
                 },
-                add:false,
+                add: false,
                 save: false,
                 //预览照片地址
                 dialogImageUrl: null,
@@ -222,7 +229,7 @@
                     token: null
                 },
                 // uploadUrl:'http://localhost:8010/adminApi/file'
-                uploadUrl:'/adminApi/file'
+                uploadUrl: '/adminApi/file'
             }
         },
         created() {
@@ -233,15 +240,25 @@
         mounted() {
             // this.article.id=this.$route.query.id
             this.article.id = this.$route.query.id
-            this.add = this.$route.query.add||false;
-            var that= this;
+            this.add = this.$route.query.add || false;
+            var that = this;
             if (this.article.id) {
                 this.loadArticleDetail(this.article.id);
-            }else if (this.add){
-                for (var key in this.article){
-                    this.article[key]=null;
+            } else if (this.add) {
+                var str = localStorage.getItem("article") || null;
+                if (str) {
+                    var article = JSON.parse(str);
+
+                    this.article = article
+
+                } else {
+                    for (var key in this.article) {
+                        this.article[key] = null;
+                    }
+                    this.article.covers = [];
                 }
-                this.article.covers=[];
+
+
             }
             var editor = new E(this.$refs.editor)
             editor.customConfig.onchange = (html) => {
@@ -250,7 +267,7 @@
 
 
             editor.customConfig.uploadImgShowBase64 = false;
-            editor.customConfig.uploadImgServer =this.uploadUrl
+            editor.customConfig.uploadImgServer = this.uploadUrl
             editor.customConfig.uploadImgParams = {
                 // 如果版本 <=v3.1.0 ，属性值会自动进行 encode ，此处无需 encode
                 // 如果版本 >=v3.1.1 ，属性值不会自动 encode ，如有需要自己手动 encode
@@ -282,8 +299,7 @@
                     // 图片上传并返回结果，但图片插入错误时触发
                     // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
                 },
-                error: function (xhr, editor)
-                {
+                error: function (xhr, editor) {
                     // Loading.close()
                     // 图片上传出错时触发
                     // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
@@ -296,11 +312,11 @@
                     // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
 
                     // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-                    console.log("res",result)
-                    if (result.code=="SUCCESS"){
+                    console.log("res", result)
+                    if (result.code == "SUCCESS") {
                         var url = result.data
                         insertImg(url)
-                    }else {
+                    } else {
                         that.$message.error("保存错误！");
                     }
 
@@ -310,7 +326,9 @@
             }
 
             editor.create();
-            this.editor=editor;
+
+            this.editor = editor;
+            this.editor.txt.append(this.article.articleBody)
 
         },
         methods: {
@@ -354,19 +372,19 @@
                 this.save = true;
                 if (this.coverCount == 1) {
                     var covers = [];
-                    if (this.article.covers[0]){
-                        covers[0]=this.article.covers[0]
+                    if (this.article.covers[0]) {
+                        covers[0] = this.article.covers[0]
                         this.article.covers = covers;
                     }
 
-                }else {
-                    if (this.article.covers.length<this.coverCount){
+                } else {
+                    if (this.article.covers.length < this.coverCount) {
                         this.$message.error("请上传图片");
                         return;
                     }
 
                 }
-                if (this.add){
+                if (this.add) {
                     this.addToSever();
                 } else {
                     this.updateToSever();
@@ -374,14 +392,18 @@
 
 
             },
-            updateToSever(){
+            saveArticlelocal() {
+                var str = JSON.stringify(this.article);
+                localStorage.setItem("article", str);
+            },
+            updateToSever() {
                 this.$axios.put('/adminApi/aritcle', this.article).then((res) => {
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
                         this.$router.push("/articleList");
                         return;
-                    }else {
+                    } else {
                         this.save = false;
                         this.$message.error("保存错误");
                     }
@@ -389,14 +411,17 @@
                     this.save = false;
                 })
             },
-            addToSever(){
+            addToSever() {
+                if (!this.article.title){
+                    this.article.title="临时保存";
+                }
                 this.$axios.post('/adminApi/aritcle', this.article).then((res) => {
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
                         this.$router.push("/articleList");
                         return;
-                    }else {
+                    } else {
                         this.save = false;
                         this.$message.error("保存错误");
                     }
@@ -413,7 +438,7 @@
                     var c = this.createCover(response.data);
                     this.article.covers = this.article.covers || [];
                     this.article.covers[this.uploadCoverItem] = c;
-                }else {
+                } else {
                     this.$message.error("上传图片失败，请重新上传");
                 }
             },
@@ -422,7 +447,7 @@
                 console.log(file, fileList);
             },
             createCover(path) {
-                if (!path){
+                if (!path) {
                     this.$message.error("图片路径为空");
                 }
                 var cover = {
@@ -432,7 +457,7 @@
                 }
                 return cover;
             }
-,
+            ,
 
         }
 

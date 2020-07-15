@@ -23,6 +23,7 @@ import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
 import tomweb.xyz.bjcms.vo.BjArticleListVo;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,8 +40,8 @@ public class IndexAerticleController {
     @Value("${spring.profiles.active}")
     String active;
 
-    private boolean isProd(){
-        return Objects.equals("prod",active);
+    private boolean isProd() {
+        return Objects.equals("prod", active);
     }
 
     /**
@@ -52,8 +53,8 @@ public class IndexAerticleController {
     public ModelAndView index(BaseQuery baseQuery) {
         Page page = baseQuery.startPage();
         BjArticleExample bjArticleExample = new BjArticleExample();
-        bjArticleExample.createCriteria().andStatusEqualTo("publish").andIsDeleteEqualTo(false)
-        .andPublicStatusEqualTo(1);
+        bjArticleExample.createCriteria().andIsDeleteEqualTo(false)
+                .andPublicStatusEqualTo(1);
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
@@ -61,12 +62,17 @@ public class IndexAerticleController {
         List<BjArticleListVo> bjArticleVos = new ArrayList<>();
         for (BjArticle bjArticle : bjArticles) {
             if (bjArticle.getUpdatedAt() == null) {
-                continue;
+                if (bjArticle.getUpdateOn() != null) {
+                    bjArticle.setUpdatedAt(bjArticle.getUpdateOn().getTime() / 1000);
+                } else {
+                    bjArticle.setUpdatedAt(bjArticle.getCreatedOn().getTime() / 1000);
+                }
+//                continue;
             }
             articleIs.add(bjArticle.getId());
-           if ( bjArticle.getArticleBody()!=null){
-               bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString( bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
-           }
+            if (bjArticle.getArticleBody() != null) {
+                bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString(bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
+            }
 
             bjArticleVos.add(new BjArticleListVo(bjArticle));
         }
@@ -76,7 +82,7 @@ public class IndexAerticleController {
         }
 
         ModelAndView modelAndView = new ModelAndView("index");
-        modelAndView.addObject("prod",isProd());
+        modelAndView.addObject("prod", isProd());
 
         modelAndView.addObject("bjArticles", bjArticleVos);
         return modelAndView;
@@ -93,17 +99,17 @@ public class IndexAerticleController {
     }
 
     @RequestMapping("/a/{id}")
-    public String detail(@PathVariable("id") Integer id, Model model) {
+    public String detail(@PathVariable("id") Integer id, Model model, HttpServletRequest request) {
 
         BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
-        if (bjArticle == null||bjArticle.getPublicStatus()!=1) {
+        if (bjArticle == null || bjArticle.getPublicStatus() != 1) {
             return "/error/404";
         }
         BjArticleDetail bjArticleDetail = new BjArticleDetail();
         bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
-        model.addAttribute("prod",isProd());
+        model.addAttribute("prod", isProd());
         return "article";
     }
 
@@ -129,6 +135,20 @@ public class IndexAerticleController {
             e.printStackTrace();
 
         }
+    }
+
+    @RequestMapping("/sitemap.xml")
+    public Object sitemap() {
+
+
+        return null;
+    }
+
+    @RequestMapping("/sitemap.html")
+    public Object sitemapHtml() {
+
+
+        return null;
     }
 }
 

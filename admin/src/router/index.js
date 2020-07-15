@@ -19,6 +19,11 @@ export default new Router({
             path: '/articleDetail',
             component: () => import(/* webpackChunkName: "login" */ '../components/page/ArticleDetail.vue'),
             meta: { title: '文章编辑' }
+        },
+        {
+            path: '/view',
+            component: () => import(/* webpackChunkName: "login" */ '../components/page/ViewArticleDetail.vue'),
+            meta: { title: '文章预览' }
         }
         ,
         {

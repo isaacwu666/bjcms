@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 //@RequestMapping("admin")
 @Api
 @RestController
@@ -40,14 +41,14 @@ public class ArticleApi extends BaseApi {
     ArticleCoverPhotoMapper articleCoverPhotoMapper;
 
     @GetMapping("adminApi/aritcleList")
-    public BaseVo<List<BjArticleListVo>> queryList(BaseQuery baseQuery,String title) {
+    public BaseVo<List<BjArticleListVo>> queryList(BaseQuery baseQuery, String title) {
 
         BjArticleExample example = new BjArticleExample();
-        BjArticleExample.Criteria criteria=  example.createCriteria().andIsDeleteEqualTo(false);
-        if (!StringUtils.isEmpty(title)){
-            criteria.andTitleLike("%"+title+"%");
+        BjArticleExample.Criteria criteria = example.createCriteria().andIsDeleteEqualTo(false);
+        if (!StringUtils.isEmpty(title)) {
+            criteria.andTitleLike("%" + title + "%");
         }
-        example.setOrderByClause(" updated_at desc,created_on desc");
+        example.setOrderByClause("created_on desc, updated_at desc");
         Page page = baseQuery.startPage();
         bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(example);
         return success(page);
@@ -79,16 +80,17 @@ public class ArticleApi extends BaseApi {
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
         example.createCriteria().andArticleIdEqualTo(id);
-        example.setOrderByClause(" order_no asc");
+        example.setOrderByClause(" order_no asc ");
         List<ArticleCoverPhoto> photos = articleCoverPhotoMapper.selectByExample(example);
         bjArticleDetail.setCovers(photos);
         return success(bjArticleDetail);
     }
-///adminApi/article
+
+    ///adminApi/article
     @DeleteMapping("adminApi/article/{id}")
     public BaseVo<BjArticleDetail> delete(@PathVariable("id") Integer id) {
 
-        BjArticle bjArticle =new BjArticle();
+        BjArticle bjArticle = new BjArticle();
         bjArticle.setId(id);
         bjArticle.setUpdateOn(new Date());
         bjArticle.setIsDelete(true);
@@ -112,18 +114,18 @@ public class ArticleApi extends BaseApi {
         List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
 
         if (!CollectionUtils.isEmpty(coverPhotos)) {
-            if (  coverPhotos.get(0)!=null){
+            if (coverPhotos.get(0) != null) {
 
                 ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
                 example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
                 articleCoverPhotoMapper.deleteByExample(example);
 
                 for (ArticleCoverPhoto coverPhoto : coverPhotos) {
-                    if (coverPhoto==null){
+                    if (coverPhoto == null) {
                         continue;
                     }
                     coverPhoto.setArticleId(id);
-                    if (coverPhoto.getPhotoUrl()==null){
+                    if (coverPhoto.getPhotoUrl() == null) {
                         continue;
                     }
                     articleCoverPhotoMapper.insert(coverPhoto);
@@ -139,31 +141,10 @@ public class ArticleApi extends BaseApi {
     @PostMapping("adminApi/aritcle")
     public BaseVo<BjArticleDetail> insert(@RequestBody BjArticleDetail bjArticle) {
 
-
-        List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
-        bjArticleService.getBjArticleMapper().insertSelective(bjArticle);
-        Integer id = bjArticle.getId();
-        if (bjArticle.getId()==null){
-            return error("保存错误");
-        }
-        if (!CollectionUtils.isEmpty(coverPhotos)) {
-            if (  coverPhotos.get(0)!=null){
-                ArticleCoverPhotoExample example = new ArticleCoverPhotoExample();
-                example.createCriteria().andArticleIdEqualTo(bjArticle.getId());
-                articleCoverPhotoMapper.deleteByExample(example);
-
-                for (ArticleCoverPhoto coverPhoto : coverPhotos) {
-                    if (coverPhoto==null){
-                        continue;
-                    }
-                    coverPhoto.setArticleId(id);
-                    if (coverPhoto.getPhotoUrl()==null){
-                        continue;
-                    }
-                    articleCoverPhotoMapper.insert(coverPhoto);
-                }
-            }
-
+        try {
+            bjArticleService.addAricle(bjArticle);
+        } catch (Exception e) {
+            return error(e.getMessage());
         }
 
 
@@ -171,7 +152,7 @@ public class ArticleApi extends BaseApi {
     }
 
     private BaseVo<BjArticleDetail> error(String msg) {
-        BaseVo baseVo=new BaseVo();
+        BaseVo baseVo = new BaseVo();
         baseVo.setCode("ERROR");
         baseVo.setMsg(msg);
         return baseVo;
