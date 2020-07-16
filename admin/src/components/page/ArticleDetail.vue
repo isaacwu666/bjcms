@@ -28,24 +28,32 @@
                         <el-form-item label="文章标题">
                             <!--                        <el-input v-model="article.title" type="textarea" :rows="2"></el-input>-->
                             <el-input
+                                    show-word-limit
                                     type="textarea"
-                                    :rows="2"
-                                    placeholder="请输入内容"
+                                    :rows="1"
+                                    maxlength="80"
+                                    placeholder="标题一般不超过80个字节，40个汉字"
                                     v-model="article.title">
                             </el-input>
 
                         </el-form-item>
                         <el-form-item label="SEO关键词">
                             <el-input
-                                    placeholder="请输入关键词"
-                                    v-model="article.keyWorld">
+                                    show-word-limit
+                                    maxlength="20"
+                                    placeholder="请输入关键词一般不超过20，使用_分隔"
+                                    v-model="article.keyWords">
                             </el-input>
 
                         </el-form-item>
                         <el-form-item label="SEO介绍">
                             <el-input
-                                    placeholder="请输入关键词"
-                                    v-model="article.keyWorld">
+                                    show-word-limit
+                                    type="textarea"
+                                    :rows="2"
+                                    maxlength="240"
+                                    placeholder="介绍240个字符，120个中文"
+                                    v-model="article.description">
                             </el-input>
 
                         </el-form-item>
@@ -235,7 +243,8 @@
                     appId: null,
                     //文章内容
                     articleBody: null,
-
+                    keyWords:null,
+                    description:null,
                     articleId: null,
                     articleUrl: null,
                     collection: null,

@@ -112,7 +112,25 @@ public class IndexAerticleController {
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
+        model.addAttribute("keyWords",bjArticle.getKeywords());
+        model.addAttribute("description",bjArticle.getDescription());
+
         return "article";
+    }
+    @GetMapping("/viewTmpArticle")
+    public String viewTmpArticle( Model model,Integer id){
+        BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
+        if (bjArticle == null || bjArticle.getPublicStatus() != 1) {
+            return "viewTmpArticle";
+        }
+        BjArticleDetail bjArticleDetail = new BjArticleDetail();
+        bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
+        BeanUtils.copyProperties(bjArticle, bjArticleDetail);
+        model.addAttribute("bjArticleDetail", bjArticleDetail);
+        model.addAttribute("prod", isProd());
+        model.addAttribute("keyWords",bjArticle.getKeywords());
+        model.addAttribute("description",bjArticle.getDescription());
+        return "viewTmpArticle";
     }
 
     /**
