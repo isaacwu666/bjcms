@@ -42,7 +42,7 @@
                                     show-word-limit
                                     maxlength="20"
                                     placeholder="请输入关键词一般不超过20，使用_分隔"
-                                    v-model="article.keyWords">
+                                    v-model="article.keywords">
                             </el-input>
 
                         </el-form-item>
@@ -243,7 +243,7 @@
                     appId: null,
                     //文章内容
                     articleBody: null,
-                    keyWords:null,
+                    keywords:null,
                     description:null,
                     articleId: null,
                     articleUrl: null,
