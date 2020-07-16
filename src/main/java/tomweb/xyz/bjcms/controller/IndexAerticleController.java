@@ -83,6 +83,8 @@ public class IndexAerticleController {
 
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("prod", isProd());
+        modelAndView.addObject("keyWords",null);
+        modelAndView.addObject("description",null);
 
         modelAndView.addObject("bjArticles", bjArticleVos);
         return modelAndView;

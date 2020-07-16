@@ -4,15 +4,28 @@
             <span style="line-height: 60px;margin-left: 30px">爱旅游爱工作</span>
             <span style="line-height: 60px;margin-right: 30px;float: right"><a href="/" @click="logout()">退出</a></span>
         </div>
-        <div class="container-editor" v-loading="save">
+        <div class="container-editor"style="padding: 20px" v-loading="save">
+            <div class="editor" style="height: auto; box-shadow: 1px 1px 1px 1px rgba(255, 255, 255, 0.5), -1px 1px 1px 1px rgba(255, 255, 255, 0.5);">
+                <el-button  @click="editorShow=!editorShow">切换编辑器</el-button>
+            </div>
             <div class="editor" v-show="!uploadCover">
-                <div ref="editor" style="text-align:left;height: 100%"></div>
+
+                <div v-show="editorShow" ref="editor" style="text-align:left;height: 100%"></div>
+                <div v-show="!editorShow" >
+                    <el-input
+                            type="textarea"
+                            :rows="15"
+
+                            v-model="article.articleBody">
+                    </el-input>
+
+                </div>
             </div>
             <div class="cover">
-                <div style="margin-top: 20px">
+                <div style="margin-top: 20px;padding: 20px">
                     <div style="height: 20px"></div>
-                    <el-form label-position="right" label-width="80px" :model="article">
-                        <el-form-item label="标题">
+                    <el-form label-position="right" label-width="100px" :model="article">
+                        <el-form-item label="文章标题">
                             <!--                        <el-input v-model="article.title" type="textarea" :rows="2"></el-input>-->
                             <el-input
                                     type="textarea"
@@ -22,7 +35,21 @@
                             </el-input>
 
                         </el-form-item>
-                        <el-form-item label="封面">
+                        <el-form-item label="SEO关键词">
+                            <el-input
+                                    placeholder="请输入关键词"
+                                    v-model="article.keyWorld">
+                            </el-input>
+
+                        </el-form-item>
+                        <el-form-item label="SEO介绍">
+                            <el-input
+                                    placeholder="请输入关键词"
+                                    v-model="article.keyWorld">
+                            </el-input>
+
+                        </el-form-item>
+                        <el-form-item label="文章封面">
                             <el-radio v-model="coverCount" :label="1">单图</el-radio>
                             <el-radio v-model="coverCount" :label="3">三图</el-radio>
 
@@ -66,6 +93,11 @@
                 <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
                            @click="saveArticlelocal()">缓存
                 </el-button>
+
+                <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
+                           @click="viewArticle()">预览
+                </el-button>
+
                 <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
                            @click="saveArticle()">保存
                 </el-button>
@@ -124,7 +156,7 @@
         width: 80%;
         max-width: 1000px;
         min-width: 800px;
-        height: 800px;
+        height: 300px;
         overflow-y: scroll;
         margin: 0 auto;
         box-shadow: 1px 1px 1px 1px #cbcbcb, -1px 1px 1px 1px rgba(255, 255, 255, 0.5);
@@ -133,8 +165,8 @@
 
     .cover {
         width: 80%;
-        max-width: 700px;
-        min-width: 600px;
+        max-width: 1000px;
+        min-width: 800px;
         height: auto;
         /*height: 1000px;*/
         margin: 0 auto;
@@ -143,8 +175,8 @@
 
     .bton {
         width: 80%;
-        max-width: 700px;
-        min-width: 600px;
+        max-width: 1000px;
+        min-width: 800px;
         height: 50px;
         /*height: 1000px;*/
         margin: 20px auto;
@@ -189,6 +221,7 @@
         components: {},
         data() {
             return {
+                editorShow:true,
                 editor: null,
 
                 coverCount: 1,
@@ -458,6 +491,11 @@
                 return cover;
             }
             ,
+            viewArticle() {
+                var str = JSON.stringify(this.article);
+                localStorage.setItem("article", str);
+                window.open("/viewTmpArticle")
+            },
 
         }
 
