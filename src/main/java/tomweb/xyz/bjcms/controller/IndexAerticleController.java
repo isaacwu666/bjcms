@@ -50,13 +50,14 @@ public class IndexAerticleController {
      * @return
      */
     @RequestMapping("/")
-    public ModelAndView index(BaseQuery baseQuery) {
+    public ModelAndView index(BaseQuery baseQuery, HttpServletRequest request) {
         Page page = baseQuery.startPage();
         BjArticleExample bjArticleExample = new BjArticleExample();
         bjArticleExample.createCriteria().andIsDeleteEqualTo(false)
                 .andPublicStatusEqualTo(1);
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
+        String serverName = request.getServerName();
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
         Set<Integer> articleIs = new HashSet<>();
         List<BjArticleListVo> bjArticleVos = new ArrayList<>();
@@ -83,8 +84,9 @@ public class IndexAerticleController {
 
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("prod", isProd());
-        modelAndView.addObject("keyWords",null);
-        modelAndView.addObject("description",null);
+        modelAndView.addObject("serverName","tomweb.xyz");
+        modelAndView.addObject("keyWords", null);
+        modelAndView.addObject("description", null);
 
         modelAndView.addObject("bjArticles", bjArticleVos);
         return modelAndView;
@@ -96,8 +98,8 @@ public class IndexAerticleController {
      * @return
      */
     @RequestMapping("/index.html")
-    public ModelAndView index2(BaseQuery baseQuery) {
-        return index(baseQuery);
+    public ModelAndView index2(BaseQuery baseQuery,HttpServletRequest request) {
+        return index(baseQuery,request);
     }
 
     @RequestMapping("/a/{id}")
@@ -112,13 +114,14 @@ public class IndexAerticleController {
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
-        model.addAttribute("keyWords",bjArticle.getKeywords());
-        model.addAttribute("description",bjArticle.getDescription());
+        model.addAttribute("keyWords", bjArticle.getKeywords());
+        model.addAttribute("description", bjArticle.getDescription());
 
         return "article";
     }
+
     @GetMapping("/viewTmpArticle")
-    public String viewTmpArticle( Model model,Integer id){
+    public String viewTmpArticle(Model model, Integer id) {
         BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
         if (bjArticle == null || bjArticle.getPublicStatus() != 1) {
             return "viewTmpArticle";
@@ -128,8 +131,8 @@ public class IndexAerticleController {
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
-        model.addAttribute("keyWords",bjArticle.getKeywords());
-        model.addAttribute("description",bjArticle.getDescription());
+        model.addAttribute("keyWords", bjArticle.getKeywords());
+        model.addAttribute("description", bjArticle.getDescription());
         return "viewTmpArticle";
     }
 
