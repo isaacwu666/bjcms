@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dto.BaseQuery;
+import tomweb.xyz.bjcms.dto.admin.ArticleQuery;
 import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.service.BjArticleService;
 import tomweb.xyz.bjcms.vo.BaseVo;
@@ -41,17 +42,15 @@ public class ArticleApi extends BaseApi {
     ArticleCoverPhotoMapper articleCoverPhotoMapper;
 
     @GetMapping("adminApi/aritcleList")
-    public BaseVo<List<BjArticleListVo>> queryList(BaseQuery baseQuery, String title) {
+    public BaseVo<List<BjArticleListVo>> queryList(ArticleQuery baseQuery) {
 
-        BjArticleExample example = new BjArticleExample();
-        BjArticleExample.Criteria criteria = example.createCriteria().andIsDeleteEqualTo(false);
-        if (!StringUtils.isEmpty(title)) {
-            criteria.andTitleLike("%" + title + "%");
-        }
-        example.setOrderByClause("created_on desc, updated_at desc");
+
         Page page = baseQuery.startPage();
-        bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(example);
-        return success(page);
+        List list = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(baseQuery.toExample());
+        List<BjArticleListVo> vos = bjArticleService.toBjAticleListVo(list);
+
+
+        return success(page).setData(vos);
     }
 
 
@@ -149,13 +148,6 @@ public class ArticleApi extends BaseApi {
 
 
         return success();
-    }
-
-    private BaseVo<BjArticleDetail> error(String msg) {
-        BaseVo baseVo = new BaseVo();
-        baseVo.setCode("ERROR");
-        baseVo.setMsg(msg);
-        return baseVo;
     }
 
 

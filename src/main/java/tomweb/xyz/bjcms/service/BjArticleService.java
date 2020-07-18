@@ -16,12 +16,10 @@ import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.pojo.BjArticle;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
+import tomweb.xyz.bjcms.vo.BjArticleListVo;
 
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class BjArticleService {
@@ -29,6 +27,11 @@ public class BjArticleService {
     BjArticleMapper bjArticleMapper;
     @Autowired
     BaiJiaHaoUtils baiJiaHaoUtils;
+
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    ArticleCoverPhotoService articleCoverPhotoService;
 
     public BjArticleMapper getBjArticleMapper() {
         return bjArticleMapper;
@@ -149,4 +152,35 @@ public class BjArticleService {
 
     @Autowired
     ArticleCoverPhotoMapper articleCoverPhotoMapper;
+
+    public List<BjArticleListVo> toBjAticleListVo(List<BjArticle> bjArticles) {
+        Set<Integer> articleIs = new HashSet<>();
+        List<BjArticleListVo> bjArticleVos = new ArrayList<>();
+        Set<Integer> categoryIds = new HashSet<>();
+        for (BjArticle bjArticle : bjArticles) {
+            categoryIds.add(bjArticle.getCategoryId());
+            if (bjArticle.getUpdatedAt() == null) {
+                if (bjArticle.getUpdateOn() != null) {
+                    bjArticle.setUpdatedAt(bjArticle.getUpdateOn().getTime() / 1000);
+                } else {
+                    bjArticle.setUpdatedAt(bjArticle.getCreatedOn().getTime() / 1000);
+                }
+//                continue;
+            }
+            articleIs.add(bjArticle.getId());
+            if (bjArticle.getArticleBody() != null) {
+                bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString(bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
+            }
+
+            bjArticleVos.add(new BjArticleListVo(bjArticle));
+        }
+        Map<Integer, List<ArticleCoverPhoto>> coverMap = articleCoverPhotoService.queryArticleCoverPhotoMap(articleIs);
+        Map<Integer, Category> categoryMap = categoryService.queryCategoryMapByIds(categoryIds);
+        for (BjArticleListVo bjArticleVo : bjArticleVos) {
+            bjArticleVo.setCoverPhotos(coverMap.get(bjArticleVo.getId()));
+            bjArticleVo.addCategory(categoryMap.get(bjArticleVo.getCategoryId()));
+        }
+        return bjArticleVos;
+    }
+
 }

@@ -41,5 +41,11 @@ public class BaseApi {
         baseVo.setMsg("ERROR");
         return baseVo;
     }
+    public BaseVo error(String msg) {
+        BaseVo baseVo = new BaseVo();
+        baseVo.setCode("ERROR");
+        baseVo.setMsg(msg);
+        return baseVo;
+    }
 
 }

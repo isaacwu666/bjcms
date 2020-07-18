@@ -4,6 +4,8 @@ import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,32 +15,41 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dto.BaseQuery;
-import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
-import tomweb.xyz.bjcms.pojo.BjAccount;
-import tomweb.xyz.bjcms.pojo.BjArticle;
-import tomweb.xyz.bjcms.pojo.BjArticleExample;
+import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.service.ArticleCoverPhotoService;
 import tomweb.xyz.bjcms.service.BjArticleService;
+import tomweb.xyz.bjcms.service.CategoryService;
+import tomweb.xyz.bjcms.service.ConfigService;
 import tomweb.xyz.bjcms.utils.BaiJiaHaoUtils;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
 import tomweb.xyz.bjcms.vo.BjArticleListVo;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
+import static tomweb.xyz.bjcms.config.StaticValue.Config.*;
+
 @Controller
 public class IndexAerticleController {
+
+
     @Autowired
     BaiJiaHaoUtils baiJiaHaoUtils;
     @Autowired
     BjArticleService bjArticleService;
     @Autowired
     ArticleCoverPhotoService articleCoverPhotoService;
+    @Autowired
+    CategoryService categoryService;
+
     @Value("${spring.profiles.active}")
     String active;
+    @Autowired
+    ConfigService configService;
 
     private boolean isProd() {
         return Objects.equals("prod", active);
@@ -58,37 +69,20 @@ public class IndexAerticleController {
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
         String serverName = request.getServerName();
+
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
-        Set<Integer> articleIs = new HashSet<>();
-        List<BjArticleListVo> bjArticleVos = new ArrayList<>();
-        for (BjArticle bjArticle : bjArticles) {
-            if (bjArticle.getUpdatedAt() == null) {
-                if (bjArticle.getUpdateOn() != null) {
-                    bjArticle.setUpdatedAt(bjArticle.getUpdateOn().getTime() / 1000);
-                } else {
-                    bjArticle.setUpdatedAt(bjArticle.getCreatedOn().getTime() / 1000);
-                }
-//                continue;
-            }
-            articleIs.add(bjArticle.getId());
-            if (bjArticle.getArticleBody() != null) {
-                bjArticle.setArticleBody(baiJiaHaoUtils.splitAndFilterString(bjArticle.getArticleBody(), bjArticle.getArticleBody().length()));
-            }
+        List<BjArticleListVo> bjArticleVos = bjArticleService.toBjAticleListVo(bjArticles);
 
-            bjArticleVos.add(new BjArticleListVo(bjArticle));
-        }
-        Map<Integer, List<ArticleCoverPhoto>> coverMap = articleCoverPhotoService.queryArticleCoverPhotoMap(articleIs);
-        for (BjArticleListVo bjArticleVo : bjArticleVos) {
-            bjArticleVo.setCoverPhotos(coverMap.get(bjArticleVo.getId()));
-        }
-
+        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_INDEX,CONFIG_TYPE_SITE);
+        List<Category> categoryList = categoryService.getIndexList();
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("prod", isProd());
-        modelAndView.addObject("serverName","tomweb.xyz");
+        modelAndView.addObject("serverName", serverName);
         modelAndView.addObject("keyWords", null);
         modelAndView.addObject("description", null);
-
+        modelAndView.addObject("categoryList", categoryList);
         modelAndView.addObject("bjArticles", bjArticleVos);
+        modelAndView.addAllObjects(configMap);
         return modelAndView;
     }
 
@@ -98,8 +92,8 @@ public class IndexAerticleController {
      * @return
      */
     @RequestMapping("/index.html")
-    public ModelAndView index2(BaseQuery baseQuery,HttpServletRequest request) {
-        return index(baseQuery,request);
+    public ModelAndView index2(BaseQuery baseQuery, HttpServletRequest request) {
+        return index(baseQuery, request);
     }
 
     @RequestMapping("/a/{id}")
@@ -111,14 +105,24 @@ public class IndexAerticleController {
         }
         BjArticleDetail bjArticleDetail = new BjArticleDetail();
         bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
+        String serverName = request.getServerName();
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
+        Category category = categoryService.getById(bjArticle.getCategoryId());
+        if (category!=null){
+            bjArticleDetail.setCategoryName(category.getCategoryName());
+        }
+        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE,CONFIG_TYPE_SITE);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
+        model.addAttribute("serverName", serverName);
         model.addAttribute("keyWords", bjArticle.getKeywords());
         model.addAttribute("description", bjArticle.getDescription());
+        model.addAllAttributes(configMap);
 
         return "article";
     }
+//    @Autowired
+//    CategoryService categoryService;
 
     @GetMapping("/viewTmpArticle")
     public String viewTmpArticle(Model model, Integer id) {

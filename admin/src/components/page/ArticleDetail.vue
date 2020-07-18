@@ -25,6 +25,56 @@
                 <div style="margin-top: 20px;padding: 20px">
                     <div style="height: 20px"></div>
                     <el-form label-position="right" label-width="100px" :model="article">
+
+
+                        <!--//在主页的发布状态，0未发布，1发布-->
+                        <el-form-item label="站内发布">
+
+                            <el-radio v-model="article.publicStatus" :label="0">不发布</el-radio>
+                            <el-radio v-model="article.publicStatus" :label="1">发布</el-radio>
+
+                        </el-form-item>
+
+                        <el-form-item label="文章封面">
+                            <el-radio v-model="coverCount" :label="1">单图</el-radio>
+                            <el-radio v-model="coverCount" :label="3">三图</el-radio>
+
+                            <div class="cove-upload">
+                                <div @click="uploadArticle(0)"
+                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[0]"
+                                         :src="article.covers[0].photoUrl">
+
+                                </div>
+                                <div @click="uploadArticle(1) " v-show="coverCount>1"
+                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[1]"
+                                         :src="article.covers[1].photoUrl">
+                                </div>
+                                <div @click="uploadArticle(2)" v-show="coverCount>2"
+                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
+                                    <img style="height: 100px;width: 100px" v-if="article.covers[2]"
+                                         :src="article.covers[2].photoUrl">
+                                </div>
+
+                                <el-dialog :visible.sync="dialogVisible">
+                                    <img :src="dialogImageUrl" alt="">
+                                </el-dialog>
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="文章类目">
+
+                            <el-select v-model="article.categoryId" filterable placeholder="请选择类目">
+                                <el-option
+                                        v-for="category in categoryList"
+                                        :key="category.categoryId"
+                                        :label="category.categoryName"
+                                        :value="category.categoryId">
+                                </el-option>
+                            </el-select>
+                            <el-button :loading="categoryLoading" style="margin-left: 20px" @click="loadAllCategory">刷新</el-button>
+                        </el-form-item>
+
                         <el-form-item label="文章标题">
                             <!--                        <el-input v-model="article.title" type="textarea" :rows="2"></el-input>-->
                             <el-input
@@ -57,45 +107,10 @@
                             </el-input>
 
                         </el-form-item>
-                        <el-form-item label="文章封面">
-                            <el-radio v-model="coverCount" :label="1">单图</el-radio>
-                            <el-radio v-model="coverCount" :label="3">三图</el-radio>
 
-                            <div class="cove-upload">
-                                <div @click="uploadArticle(0)"
-                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[0]"
-                                         :src="article.covers[0].photoUrl">
-
-                                </div>
-                                <div @click="uploadArticle(1) " v-show="coverCount>1"
-                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[1]"
-                                         :src="article.covers[1].photoUrl">
-                                </div>
-                                <div @click="uploadArticle(2)" v-show="coverCount>2"
-                                     style="height: 100px;width: 100px;margin-left: 20px;background:#F2F6FC">
-                                    <img style="height: 100px;width: 100px" v-if="article.covers[2]"
-                                         :src="article.covers[2].photoUrl">
-                                </div>
-
-                                <el-dialog :visible.sync="dialogVisible">
-                                    <img :src="dialogImageUrl" alt="">
-                                </el-dialog>
-                            </div>
-                        </el-form-item>
-                        <!--//在主页的发布状态，0未发布，1发布-->
-                        <el-form-item label="站内发布">
-
-                            <el-radio v-model="article.publicStatus" :label="0">不发布</el-radio>
-                            <el-radio v-model="article.publicStatus" :label="1">发布</el-radio>
-
-                        </el-form-item>
 
                     </el-form>
                 </div>
-
-
             </div>
             <div class="bton">
                 <el-button style="margin-top: 10px;float: right ;margin-right: 10px"
@@ -237,6 +252,8 @@
                 uploadCoverItem: null,
                 dialogVisible: false,
                 article: {
+                    categoryId:null,
+                    categoryName:null,
                     //简介
                     abstractTxt: null,
                     //百家号appId
@@ -271,13 +288,17 @@
                     token: null
                 },
                 // uploadUrl:'http://localhost:8010/adminApi/file'
-                uploadUrl: '/adminApi/file'
+                uploadUrl: '/adminApi/file',
+                //文章类目信息
+                categoryList:[],
+                categoryLoading:false
             }
         },
         created() {
             this.article.id = this.$route.query.id
             this.headers.token = localStorage.getItem('token');
             // this.loadArticleDetail(this.article.id);
+            this.loadAllCategory();
         },
         mounted() {
             // this.article.id=this.$route.query.id
@@ -392,6 +413,20 @@
                 }).catch((res) => {
                     console.log(res);
                     this.$message.error(res)
+                })
+            },
+            loadAllCategory(){
+                this.categoryLoading=true;
+                this.$axios.get("/adminApi/category").then(res=>{
+                    this.categoryLoading=false;
+                    if (res.data.code=="SUCCESS"){
+                        this.categoryList=res.data.data;
+                        return;
+                    }
+
+                }).catch(res=>{
+                    this.$message.error(res)
+                    this.categoryLoading=false;
                 })
             },
 

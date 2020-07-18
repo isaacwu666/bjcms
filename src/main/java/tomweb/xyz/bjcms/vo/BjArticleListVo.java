@@ -6,6 +6,7 @@ import org.apache.http.client.utils.DateUtils;
 import org.springframework.beans.BeanUtils;
 import tomweb.xyz.bjcms.pojo.ArticleCoverPhoto;
 import tomweb.xyz.bjcms.pojo.BjArticle;
+import tomweb.xyz.bjcms.pojo.Category;
 
 import javax.validation.constraints.NotNull;
 import java.text.DateFormat;
@@ -16,6 +17,21 @@ import java.util.List;
 public class BjArticleListVo {
 
     private Integer id;
+
+    /**
+     * 文章分类ID
+     */
+    @ApiModelProperty(value="文章分类ID",required = true)
+    @NotNull(message ="'文章分类ID'不能为空")
+    private Integer categoryId;
+
+    /**
+     * 类目名称
+     */
+    @ApiModelProperty(value="类目名称",required = true)
+    @NotNull(message ="'类目名称'不能为空")
+    private String categoryName;
+
 
     @ApiModelProperty(value = "百度平台更新于", required = true)
     private Date bjUpdateAt;
@@ -82,4 +98,10 @@ public class BjArticleListVo {
 
     List<ArticleCoverPhoto> coverPhotos;
 
+    public void addCategory(Category category) {
+        if (category==null){
+            return;
+        }
+        this.categoryName=category.getCategoryName();
+    }
 }

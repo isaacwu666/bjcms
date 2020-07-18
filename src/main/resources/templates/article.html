@@ -1,21 +1,13 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
-<html lang="zh-CN">
+<html xmlns:th="http://www.thymeleaf.org"  >
 <head>
-    <script th:if="${prod}">
-        var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?c51fcd25641342566646c1847e427698";
-            var s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();
-        (function(){
-            var src = "https://jspassport.ssl.qhimg.com/11.0.1.js?d182b3f28525f2db83acfaaf6e696dba";
-            document.write('<script src="' + src + '" id="sozz"><\/script>');
-        })();
-    </script>
-    <script  th:if="${prod}" data-ad-client="ca-pub-5854326718010822" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <meta charset="utf-8">
+    <th:block th:utext="${scripty}">
+        ${scripty}
+    </th:block>
+    <th:block th:utext="${meta}">
+        ${meta}
+    </th:block>
 
     <meta charset="utf-8">
     <meta name="renderer" content="webkit">
@@ -47,28 +39,9 @@
 </head>
 
 <body class="user-select single">
-<header class="header">
-    <nav class="navbar navbar-default" id="navbar">
-        <div class="container">
-            <div class="header-topbar hidden-xs link-border">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                            data-target="#header-navbar" aria-expanded="false"><span class="sr-only"></span> <span
-                            class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-                    </button>
-                    <div class="logo hvr-bounce-in"><a href="/index.html"   rel="nofollow" ><img style="height: 50px;width: 50px;border-radius:50px" src="/images/logo.png" alt="爱旅游爱工作LOGO"></a></div>
-                </div>
-                <div class="collapse navbar-collapse" id="header-navbar">
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="hidden-index active"><a data-cont="爱旅游爱生活首页" href="/index.html"  rel="nofollow">爱旅游爱生活首页</a></li>
-                        <li class="hidden-index active"><a data-cont="百家号@爱旅游爱生活"  href="https://baijiahao.baidu.com/u?app_id=1663934735086891&fr=bjharticle"  rel="nofollow" >百家号@爱旅游爱生活</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-</header>
+<div>
+    <th th:include="header::header"></th>
+</div>
 <section class="container">
     <div class="content-wrap">
         <div class="content">
@@ -80,19 +53,19 @@
             <div id="articleBody" class="article-content" th:text="${bjArticleDetail.getArticleBody()}">
                 ${bjArticleDetail.getArticleBody()}
             </div>
-
-            <div class="article-tags">标签：<span>图文</span></div>
+<!--Thymeleaf #strings.isEmpty-->
+            <div th:if="${!#strings.isEmpty(bjArticleDetail.categoryName)}" class="article-tags" >
+                <span th:text="#{article.tag}">
+                        #{article.tag}
+                </span>
+                <span>:</span>
+                <span th:text="${bjArticleDetail.categoryName}">${bjArticleDetail.categoryName}</span>
+            </div>
         </div>
     </div>
 </section>
-<footer class="footer">
-    <div class="container">
-        <p>&copy; 2020<a href="/index.html"   rel="nofollow">tomweb.xyz</a> &nbsp; <a href="http://beian.miit.gov.cn" target="_blank"
-                                                          rel="nofollow">桂ICP备19003151号-1</a> &nbsp; &nbsp; <a
-                href="https://baijiahao.baidu.com/u?app_id=1663934735086891&fr=bjharticle"   target="_blank"  rel="nofollow" >@爱旅游爱工作</a></p>
-    </div>
-    <div id="gotop"><a class="gotop"></a></div>
-</footer>
+
+<div th:include="footer :: footer"></div>
 
 
 <script src="/js/bootstrap.min.js"></script>

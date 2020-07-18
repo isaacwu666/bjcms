@@ -5,100 +5,15 @@
 
             <div style="margin-left: 50px;width: 80%">
                 <el-menu class="el-menu-demo" mode="horizontal" :default-active="activeIndex"  @select="handleSelect">
-                  <el-menu-item index="1">文章管理</el-menu-item>
-                  <el-menu-item index="3">类目管理</el-menu-item>
+                  <el-menu-item :index="1" >文章管理</el-menu-item>
+                  <el-menu-item :index="3" >类目管理</el-menu-item>
                 </el-menu>
             </div>
 
             <div style="line-height: 60px;margin-right: 30px;float: right"><a href="/" @click="logout()">退出</a></div>
 
         </div>
-        <div class="container-list"  v-show="activeIndex==3">
-
-            <div style="flex-direction: column;width: 100%">
-
-
-
-                <div class="artilce-list">
-                    <div style="display: flex; flex-direction: row">
-
-
-                        <el-form title="添加类目" inline style="text-align: center;padding-top: 10px">
-                            <el-form-item>
-                                <span v-if="!categoryDto.categoryId">添加类目：</span>
-                                <span v-else>更新类目：</span>
-                            </el-form-item>
-                            <el-form-item >
-                                <el-input label="标题" v-model="categoryDto.categoryName" placeholder="标题"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-input v-model="categoryDto.orderNo" type="number" placeholder="排序号"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button  @click="categoryDto={}">清空 </el-button>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button class="el-icon-circle-check" @click="addCategoryDto()">保存 </el-button>
-                            </el-form-item>
-
-                            <el-form-item>
-                                <el-button @click="loadAllCategory()"><i
-                                        class="el-icon-refresh"></i>更新
-                                </el-button>
-                            </el-form-item>
-
-                        </el-form>
-
-
-                    </div>
-                    <div style="height: 1px; background: #82848a;width: 100%"></div>
-                    <el-table @cell-click="editorCategory"
-                              v-loading="load"
-                              :data="categoryList"
-                              style="width: 100%">
-
-                        <el-table-column
-                                prop="orderNo"
-                                label="排序号"
-                                width="80"
-                        >
-                        </el-table-column>
-
-                        <el-table-column
-                                prop="categoryName"
-                                label="类目名称"
-                        >
-
-                        </el-table-column>
-                        <el-table-column
-                                prop="createdOn"
-                                label="创建日期"
-                                width="180">
-                        </el-table-column>
-
-                        <el-table-column
-                                fixed="right"
-                                label="操作"
-                                width="160">
-                            <template slot-scope="scope">
-                                <!--                                                        <el-button type="text" size="small">站内显示</el-button>-->
-                                <el-button type="text" @click="deleteCategory(scope.row)" size="small">删除</el-button>
-                            </template>
-                        </el-table-column>
-
-
-                    </el-table>
-                </div>
-                <!--                <div class="artilce-tips"></div>-->
-                <div style="height: 1px;background: #82848a;width: 100%"></div>
-            </div>
-        </div>
-
-
-
-
-
-        <div class="container-list" v-loading="syncBj" v-show="activeIndex==1">
+        <div class="container-list" v-loading="syncBj">
 
             <!--                            <div class="article-menu">-->
 
@@ -207,7 +122,6 @@
                 <div style="height: 1px;background: #82848a;width: 100%"></div>
             </div>
         </div>
-
         <div class="footer-list">
 
             <div style="margin: 0 auto;width: 80%"><span style="width: 100px">@tomweb.xyz</span></div>
@@ -271,7 +185,7 @@
     export default {
         data() {
             return {
-                activeIndex:"1",
+                activeIndex:3,
                 load: false,
                 syncBj: false,
                 tableData: [],
@@ -284,58 +198,16 @@
                     categoryId: null,
                     title: null
                 },
-                categoryList: [],
-                categoryDto:{
-                    categoryId:null,
-                    categoryName:null,
-                    orderNo:null
-                }
+                categoryList: []
             }
         },
         mounted() {
-            var b= {
-                publicStatus: null,
-                page: 1,
-                size: 20,
-                total: 0,
-                totalPage: 0,
-                categoryId: null,
-                title: null
-            }
-            var baseQuery =JSON.parse(localStorage.getItem("baseQuery"));
-            this.baseQuery=baseQuery||b;
-
-            if (this.activeIndex==1){
-                this.loadArticleList();
-            } else if (this.activeIndex==3){
-                this.loadAllCategory();
-            }
-
+            this.loadArticleList();
         },
         created() {
-            this.activeIndex=localStorage.getItem("activeIndex")||"1";
-            this.loadAllCategory();
-
-        },
-        beforeDestroy(){
-            localStorage.setItem("activeIndex",this.activeIndex)
-            localStorage.setItem("baseQuery",JSON.stringify(this.baseQuery))
+            this.loadAllCategory()
         },
         methods: {
-            loadAllCategory(){
-                this.categoryLoading=true;
-                this.$axios.get("/adminApi/category").then(res=>{
-                    this.categoryLoading=false;
-                    if (res.data.code=="SUCCESS"){
-                        this.categoryList=res.data.data;
-                        return;
-                    }
-
-                }).catch(res=>{
-                    this.$message.error(res)
-                    this.categoryLoading=false;
-                })
-            },
             loadAllCategory() {
                 this.categoryLoading = true;
                 this.$axios.get("/adminApi/category").then(res => {
@@ -391,15 +263,6 @@
                         id: id
                     }
                 })
-            },
-            editorCategory(row, column){
-                console.log(row, column);
-
-                if (column.label == "操作") {
-                    return;
-                }
-                this.categoryDto=row;
-
             },
             addArticle() {
                 this.$router.push({
@@ -457,90 +320,11 @@
                     });
                 });
 
-                this.loadArticleList()
-            }
-            ,deleteCategory(row) {
-                var that = this;
-                console.log(row);
-                this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    that.$axios.delete("/adminApi/category/" + row.categoryId).then(res => {
-                        if (res.data.code == "SUCCESS") {
-                            that.$message.success("删除成功");
-                            that.loadAllCategory();
-                            return;
-                        }
-                        that.$message.error("删除失败");
-                        return;
-                    }).catch(res => {
-                        that.$message.error("删除失败");
-                        return;
-                    })
-
-
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });
 
                 this.loadArticleList()
             },
             handleSelect(index){
                 console.log(index);
-                this.activeIndex=index
-                switch (index) {
-                    case "1":
-                        if (!this.tableData[0]){
-                            console.log("loadArticleList");
-                            this.loadArticleList()
-                        }
-
-                        break
-                    case "3":
-                        if (!this.categoryList[0]){
-                            console.log("loadAllCategory");
-                            this.loadAllCategory();
-                        }
-
-                        break;
-                }
-            },
-            addCategoryDto(){
-
-                if (!this.categoryDto.categoryName){
-                    this.$message.error("请输入类目名字");
-                    return;
-                }
-                if (!this.categoryDto.orderNo){
-                    this.$message.error("请输入类目排序编码");
-                    return;
-                }
-                this.load=true;
-                this.$axios.post("/adminApi/category",this.categoryDto).then(res=>{
-                    this.load=false;
-                    if (res.data.code=="SUCCESS"){
-                        this.$message.success("添加成功");
-                        this.loadAllCategory();
-                        for (var key in this.categoryDto){
-                            this.categoryDto[key]=null;
-                        }
-                        return;
-
-                    }else {
-                        this.$message.success(res.data.msg);
-                        return;;
-                    }
-                }).catch(res=>{
-                    this.$message.error(res);
-                    this.load=false;
-                })
-
-
             }
         }
     };
