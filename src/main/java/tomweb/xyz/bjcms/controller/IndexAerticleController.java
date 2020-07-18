@@ -112,12 +112,13 @@ public class IndexAerticleController {
             bjArticleDetail.setCategoryName(category.getCategoryName());
         }
         Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE,CONFIG_TYPE_SITE);
+        model.addAllAttributes(configMap);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
         model.addAttribute("serverName", serverName);
         model.addAttribute("keyWords", bjArticle.getKeywords());
         model.addAttribute("description", bjArticle.getDescription());
-        model.addAllAttributes(configMap);
+
 
         return "article";
     }
@@ -162,6 +163,13 @@ public class IndexAerticleController {
             e.printStackTrace();
 
         }
+    }
+    @RequestMapping("/c")
+    public String categotry(Integer categoryId,Model model){
+        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE,CONFIG_TYPE_SITE);
+        model.addAllAttributes(configMap);
+
+        return "category";
     }
 
     @RequestMapping("/sitemap.xml")
