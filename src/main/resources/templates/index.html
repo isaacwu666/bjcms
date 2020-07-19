@@ -79,7 +79,7 @@
                     </th>
 
 
-                    <header><span class="cat">图文<i></i></span>
+                    <header><span class="cat" th:text="#{article.typeTag}">#{article.typeTag}<i></i></span>
                         <a th:href="@{'/a/'+${article.id}}" th:title="${article.title}"
                            th:text="${article.title}"></a></h2>
                     </header>

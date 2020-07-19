@@ -31,9 +31,11 @@ import java.util.UUID;
 @Api
 @RestController
 public class ArticleApi extends BaseApi {
+
     @Value("${base.upload.fail.clue.path}")
     String filePath;
-    @Value("${server.image.root}")
+
+//    @Value("${server.image.root}")
     String serverImageRoot;
 
     @Autowired
@@ -155,6 +157,9 @@ public class ArticleApi extends BaseApi {
     @PostMapping("adminApi/file")
 
     public BaseVo uploadFile(@RequestParam("fileName") MultipartFile file, HttpServletRequest request) {
+        String root = "https://" + request.getServerName();
+        serverImageRoot = root;
+
         String string = UUID.randomUUID().toString().replaceAll("-", "");
         String a2 = file.getOriginalFilename();
         String[] s = a2.split("\\.");
