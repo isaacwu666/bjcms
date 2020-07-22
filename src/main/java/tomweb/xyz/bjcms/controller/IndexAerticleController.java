@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.TemplateEngine;
 import tomweb.xyz.bjcms.dao.ArticleCoverPhotoMapper;
 import tomweb.xyz.bjcms.dto.BaseQuery;
 import tomweb.xyz.bjcms.pojo.*;
@@ -51,6 +53,17 @@ public class IndexAerticleController {
     @Autowired
     ConfigService configService;
 
+
+    @Autowired
+    private TemplateEngine templateEngine;//这是thymeleaf模板处理引擎
+
+    @Autowired
+    private ApplicationContext appContext;//这是Spring容器上下文
+
+
+    private String staticHtmlPath;//这是工程中的配置属性，如静态文件的根目录/usr/local/nginx/html
+
+
     private boolean isProd() {
         return Objects.equals("prod", active);
     }
@@ -73,7 +86,7 @@ public class IndexAerticleController {
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
         List<BjArticleListVo> bjArticleVos = bjArticleService.toBjAticleListVo(bjArticles);
 
-        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_INDEX,CONFIG_TYPE_SITE);
+        Map<String, String> configMap = configService.queryKeyValueMapByConfigType(CONFIG_TYPE_INDEX, CONFIG_TYPE_SITE);
         List<Category> categoryList = categoryService.getIndexList();
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("prod", isProd());
@@ -108,10 +121,10 @@ public class IndexAerticleController {
         String serverName = request.getServerName();
         BeanUtils.copyProperties(bjArticle, bjArticleDetail);
         Category category = categoryService.getById(bjArticle.getCategoryId());
-        if (category!=null){
+        if (category != null) {
             bjArticleDetail.setCategoryName(category.getCategoryName());
         }
-        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE,CONFIG_TYPE_SITE);
+        Map<String, String> configMap = configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE, CONFIG_TYPE_SITE);
         model.addAllAttributes(configMap);
         model.addAttribute("bjArticleDetail", bjArticleDetail);
         model.addAttribute("prod", isProd());
@@ -164,9 +177,10 @@ public class IndexAerticleController {
 
         }
     }
+
     @RequestMapping("/c")
-    public String categotry(Integer categoryId,Model model){
-        Map<String,String> configMap =configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE,CONFIG_TYPE_SITE);
+    public String categotry(Integer categoryId, Model model) {
+        Map<String, String> configMap = configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE, CONFIG_TYPE_SITE);
         model.addAllAttributes(configMap);
 
         return "category";
@@ -185,5 +199,6 @@ public class IndexAerticleController {
 
         return null;
     }
+
 }
 

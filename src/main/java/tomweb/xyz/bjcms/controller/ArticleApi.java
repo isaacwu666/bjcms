@@ -15,6 +15,7 @@ import tomweb.xyz.bjcms.dto.BaseQuery;
 import tomweb.xyz.bjcms.dto.admin.ArticleQuery;
 import tomweb.xyz.bjcms.pojo.*;
 import tomweb.xyz.bjcms.service.BjArticleService;
+import tomweb.xyz.bjcms.utils.StaticHtmlUtils;
 import tomweb.xyz.bjcms.vo.BaseVo;
 import tomweb.xyz.bjcms.vo.BjArticleDetail;
 import tomweb.xyz.bjcms.vo.BjArticleListVo;
@@ -22,20 +23,18 @@ import tomweb.xyz.bjcms.vo.BjArticleListVo;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 //@RequestMapping("admin")
 @Api
 @RestController
 public class ArticleApi extends BaseApi {
-
+    @Autowired
+    StaticHtmlUtils staticHtmlUtils;
     @Value("${base.upload.fail.clue.path}")
     String filePath;
 
-//    @Value("${server.image.root}")
+    //    @Value("${server.image.root}")
     String serverImageRoot;
 
     @Autowired
@@ -133,6 +132,9 @@ public class ArticleApi extends BaseApi {
                 }
             }
 
+        }
+        if (Objects.equals(bjArticle.getPublicStatus(), 1)) {
+            staticHtmlUtils.staticArticle(bjArticle.getId());
         }
 
         bjArticleService.getBjArticleMapper().updateByPrimaryKeyWithBLOBs(bjArticle);
