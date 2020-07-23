@@ -164,6 +164,7 @@
                     var article = JSON.parse(str);
 
                     this.article = article
+                    localStorage.removeItem("article")
 
                 } else {
                     for (var key in this.article) {
@@ -320,6 +321,13 @@
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
+                        for (let articleKey in this.article) {
+                            this.article[articleKey]=null;
+                        }
+                        this.article.covers=[];
+                        // localStorage.setItem("article",null)
+                        localStorage.removeItem("article")
+
                         this.$router.push("/articleList");
                         return;
                     } else {
@@ -335,6 +343,9 @@
                     this.save = false;
                     if (res.data.code == "SUCCESS") {
                         this.$message.success(res.data.msg);
+
+                        localStorage.removeItem("article")
+
                         this.$router.push("/articleList");
                         return;
                     } else {

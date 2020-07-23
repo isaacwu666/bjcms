@@ -9,7 +9,7 @@ import java.io.*;
 
 @Component
 public class StaticHtmlUtils {
-    @Value("#{htmlRootPath}")
+    @Value("${htmlRootPath}")
     String htmlRootPath;
     @Autowired
     RestTemplate restTemplate;
@@ -43,13 +43,13 @@ public class StaticHtmlUtils {
     }
 
     public synchronized String  staticArticle(Integer id) {
-        String string = restTemplate.getForObject("http://" + host + ":" + port + "/" + "a/"+id, String.class);
+        String string = restTemplate.getForObject("http://" + host + ":" + port + "/" + "a/"+id+".html", String.class);
         File htmlRootPathFile = new File(htmlRootPath+"a");
         if (!htmlRootPathFile.exists()) {
             htmlRootPathFile.mkdirs();
         }
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(htmlRootPath+"a/" + id));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(htmlRootPath+"a/" + id+".html"));
             fileOutputStream.write(string.getBytes("utf-8"));
             fileOutputStream.close();
             return string;

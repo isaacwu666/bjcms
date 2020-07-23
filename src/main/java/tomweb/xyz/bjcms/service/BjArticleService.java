@@ -124,8 +124,9 @@ public class BjArticleService {
 
     @Transactional(rollbackFor = Exception.class)
     public void addAricle(BjArticleDetail bjArticle) {
-        Integer id = bjArticle.getId();
         List<ArticleCoverPhoto> coverPhotos = bjArticle.getCovers();
+        bjArticleMapper.insertSelective(bjArticle);
+        Integer id = bjArticle.getId();
         if (bjArticle.getId() == null) {
             throw new RuntimeException("保存错误");
         }

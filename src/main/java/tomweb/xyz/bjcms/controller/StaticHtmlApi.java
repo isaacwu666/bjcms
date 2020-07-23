@@ -14,8 +14,7 @@ public class StaticHtmlApi extends BaseApi {
 
     @GetMapping("/adminApi/static/index")
     public BaseVo index() {
-        String s
-                = staticHtmlUtils.staticIndex();
+        String s = staticHtmlUtils.staticIndex();
         return success().setData(s);
     }
 

@@ -1,5 +1,5 @@
 SERVER_JAR_PATH=/usr/local/app/bjcms
-SERVER_HOST="www.tomweb.xyz"
+SERVER_HOST="203.195.242.69"
 SERVER_NAME=bjcms_8010.server
 SERVER_JAR_AEGS= -spring.profiles.active=prod
 

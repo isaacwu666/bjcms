@@ -111,6 +111,10 @@
 
                         <el-form inline style="text-align: center;padding-top: 10px">
                             <el-form-item>
+                                <el-button @click="staticIndex" v-loading="syncBj">首页静态化<i class="el-icon-bottom"/>
+                                </el-button>
+                            </el-form-item>
+                            <el-form-item>
                                 <el-button @click="syncBjArticle" v-loading="syncBj">从百家号同步<i class="el-icon-bottom"/>
                                 </el-button>
                             </el-form-item>
@@ -186,6 +190,7 @@
                                 width="160">
                             <template slot-scope="scope">
                                 <!--                                                        <el-button type="text" size="small">站内显示</el-button>-->
+                                <el-button type="text" @click="staticAricle(scope.row)" size="small">静态</el-button>
                                 <el-button type="text" @click="deleteAricle(scope.row)" size="small">删除</el-button>
                             </template>
                         </el-table-column>
@@ -458,6 +463,22 @@
                 });
 
                 this.loadArticleList()
+            } ,staticAricle(row) {
+                var that = this;
+                console.log(row);
+
+                that.$axios.get("/adminApi/static/article?id=" + row.id).then(res => {
+                        if (res.data.code == "SUCCESS") {
+                            that.$message.success("SUCCESS");
+                            // that.loadArticleList();
+                            return;
+                        }
+                        that.$message.error("error");
+                        return;
+                    }).catch(res => {
+                        that.$message.error(res);
+                        return;
+                    })
             }
             ,deleteCategory(row) {
                 var that = this;
@@ -490,6 +511,7 @@
 
                 this.loadArticleList()
             },
+
             handleSelect(index){
                 console.log(index);
                 this.activeIndex=index
@@ -541,7 +563,19 @@
                 })
 
 
+            },
+            staticIndex(){
+                this.$axios.get("/adminApi/static/index").then(res=>{
+                    if (res.data.code=="SUCCESS"){
+                        this.$message.success("SUCCESS");
+                    } else {
+                        this.$message.error("error");
+                    }
+                }).catch(res=>{
+                    this.$message.error(res)
+                })
             }
+
         }
     };
 </script>

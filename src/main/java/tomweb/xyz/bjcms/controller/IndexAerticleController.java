@@ -82,6 +82,9 @@ public class IndexAerticleController {
         ;
         bjArticleExample.setOrderByClause("updated_at desc");
         String serverName = request.getServerName();
+        if (serverName.equals("localhost")){
+            serverName="tomweb.xyz";
+        }
 
         List<BjArticle> bjArticles = bjArticleService.getBjArticleMapper().selectByExampleWithBLOBs(bjArticleExample);
         List<BjArticleListVo> bjArticleVos = bjArticleService.toBjAticleListVo(bjArticles);
@@ -90,7 +93,7 @@ public class IndexAerticleController {
         List<Category> categoryList = categoryService.getIndexList();
         ModelAndView modelAndView = new ModelAndView("index");
         modelAndView.addObject("prod", isProd());
-        modelAndView.addObject("serverName", serverName);
+        modelAndView.addObject("serverName", serverName.toUpperCase());
         modelAndView.addObject("keyWords", null);
         modelAndView.addObject("description", null);
         modelAndView.addObject("categoryList", categoryList);
@@ -111,6 +114,33 @@ public class IndexAerticleController {
 
     @RequestMapping("/a/{id}")
     public String detail(@PathVariable("id") Integer id, Model model, HttpServletRequest request) {
+
+        BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
+        if (bjArticle == null || bjArticle.getPublicStatus() != 1) {
+            return "/error/404";
+        }
+        BjArticleDetail bjArticleDetail = new BjArticleDetail();
+        bjArticleDetail.setCovers(articleCoverPhotoService.selectByAricleIds(id));
+        String serverName = request.getServerName();
+        BeanUtils.copyProperties(bjArticle, bjArticleDetail);
+        Category category = categoryService.getById(bjArticle.getCategoryId());
+        if (category != null) {
+            bjArticleDetail.setCategoryName(category.getCategoryName());
+        }
+        Map<String, String> configMap = configService.queryKeyValueMapByConfigType(CONFIG_TYPE_ARTICLE, CONFIG_TYPE_SITE);
+        model.addAllAttributes(configMap);
+        model.addAttribute("bjArticleDetail", bjArticleDetail);
+        model.addAttribute("prod", isProd());
+        model.addAttribute("serverName", serverName);
+        model.addAttribute("keyWords", bjArticle.getKeywords());
+        model.addAttribute("description", bjArticle.getDescription());
+
+
+        return "article";
+    }
+
+    @RequestMapping("/a/{id}.html")
+    public String detailHtml(@PathVariable("id") Integer id, Model model, HttpServletRequest request) {
 
         BjArticle bjArticle = bjArticleService.getBjArticleMapper().selectByPrimaryKey(id);
         if (bjArticle == null || bjArticle.getPublicStatus() != 1) {

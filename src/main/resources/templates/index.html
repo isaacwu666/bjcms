@@ -71,7 +71,7 @@
             <tr th:each="article,articleStart : ${bjArticles}">
 
                 <article class="excerpt excerpt-1">
-                    <a class="focus" th:href="@{'/a/'+${article.id}}" title="">
+                    <a class="focus" th:href="@{'/a/'+${article.id}+'.html'}" title="">
                         <th th:if="${article.coverPhotos ne null }">
                             <img class="thumb" th:data-original="${article.coverPhotos[0].photoUrl}"
                                  th:src="${article.coverPhotos[0].photoUrl}" th:alt="${article.title}">
@@ -80,7 +80,7 @@
 
 
                     <header><span class="cat" th:text="#{article.typeTag}">#{article.typeTag}<i></i></span>
-                        <a th:href="@{'/a/'+${article.id}}" th:title="${article.title}"
+                        <a th:href="@{'/a/'+${article.id}+'.html'}" th:title="${article.title}"
                            th:text="${article.title}"></a></h2>
                     </header>
                     <p class="meta">
