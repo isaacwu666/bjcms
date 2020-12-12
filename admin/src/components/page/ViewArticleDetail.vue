@@ -317,6 +317,9 @@
                 this.$router.push("view")
             },
             updateToSever() {
+                if (this.article.createdOn){
+                    this.article.createdOn=null;
+                }
                 this.$axios.put('/adminApi/aritcle', this.article).then((res) => {
                     this.save = false;
                     if (res.data.code == "SUCCESS") {

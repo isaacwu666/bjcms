@@ -15,7 +15,6 @@ import tomweb.xyz.bjcms.utils.JwtUtils;
 import tomweb.xyz.bjcms.vo.BaseVo;
 
 import java.io.UnsupportedEncodingException;
-//@RequestMapping("admin")
 @RestController
 public class AdminInfoApi extends BaseApi {
 

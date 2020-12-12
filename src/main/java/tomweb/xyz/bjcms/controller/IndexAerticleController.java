@@ -80,7 +80,7 @@ public class IndexAerticleController {
         bjArticleExample.createCriteria().andIsDeleteEqualTo(false)
                 .andPublicStatusEqualTo(1);
         ;
-        bjArticleExample.setOrderByClause("updated_at desc");
+        bjArticleExample.setOrderByClause("created_on desc,updated_at desc");
         String serverName = request.getServerName();
         if (serverName.equals("localhost")){
             serverName="tomweb.xyz";
